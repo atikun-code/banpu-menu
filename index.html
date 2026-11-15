@@ -23,7 +23,7 @@ body.hidecur{cursor:none}
 @keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(6vmin,-4vmin) scale(1.12)}100%{transform:translate(-5vmin,5vmin) scale(.95)}}
 .grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.05;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:4px 4px}
 
-#stage{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr);z-index:1;overflow:hidden}
+#stage{position:fixed;inset:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr);z-index:1;overflow:hidden}
 
 /* ---------- header ---------- */
 header{display:flex;align-items:center;gap:calc(2.2*var(--u));padding:calc(2.4*var(--u)) calc(3.6*var(--u)) calc(1.4*var(--u))}
@@ -281,13 +281,35 @@ body.fest .b3{background:var(--acc);opacity:.18}
 .fest-slide .shop2{display:inline-block;margin-top:calc(3*var(--u));padding:calc(1*var(--u)) calc(3*var(--u));border-radius:99px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);font-size:calc(var(--fs)*2.6*var(--u))}
 .fest-row{display:flex;gap:calc(3*var(--u));justify-content:center;margin-top:calc(2*var(--u));font-size:calc(var(--fs)*6*var(--u))}
 .fest-row span{display:inline-block;animation:bob 3s ease-in-out infinite;animation-delay:calc(var(--i) * .35s)}
+/* ---------- ชื่อร้านบรรทัดเดียว ---------- */
+.hname{flex:1;min-width:0}
+.shop{white-space:nowrap;overflow:hidden;text-overflow:clip}
+.tag{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ---------- ประกาศวันหยุดร้าน ---------- */
+.clbar{display:none}
+.clbar.on{display:flex;align-items:center;gap:calc(1.4*var(--u));margin:0 calc(3.6*var(--u)) calc(1.2*var(--u));padding:calc(1*var(--u)) calc(2.2*var(--u));border-radius:calc(1.6*var(--u));background:linear-gradient(90deg,#C0392B,#E8A33D);color:#fff;font-size:calc(var(--fs)*2.5*var(--u));box-shadow:0 calc(.6*var(--u)) calc(2.4*var(--u)) rgba(192,57,43,.45);animation:clPulse 2.4s ease-in-out infinite}
+.clbar b{font-weight:800}.clbar span{margin-left:auto;opacity:.95;font-size:.85em;white-space:nowrap}
+@keyframes clPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}
+.closed-slide{flex:1;display:grid;place-items:center;text-align:center;margin-bottom:calc(1*var(--u));border-radius:calc(3*var(--u));background:radial-gradient(circle at 50% 30%,#E74C3C,#7B1E14);color:#fff;position:relative;overflow:hidden}
+.closed-slide::before{content:'';position:absolute;inset:calc(1.6*var(--u));border:calc(.4*var(--u)) dashed rgba(255,255,255,.35);border-radius:calc(2.4*var(--u))}
+.cl-in{position:relative;padding:calc(2*var(--u))}
+.cl-ic{font-size:calc(14*var(--u));line-height:1}
+.on .cl-ic{animation:festPop 1s cubic-bezier(.3,1.6,.5,1) both,bob 3s ease-in-out infinite 1s}
+.cl-k{display:inline-block;margin-top:calc(1*var(--u));background:#fff;color:#C0392B;border-radius:99px;padding:calc(.4*var(--u)) calc(2*var(--u));font-weight:800;font-size:calc(var(--fs)*2.4*var(--u))}
+.closed-slide h2{font-size:calc(var(--fs)*11*var(--u));font-weight:800;line-height:1.05;margin-top:calc(1*var(--u));text-shadow:0 calc(.6*var(--u)) calc(2*var(--u)) rgba(0,0,0,.3)}
+.cl-d{font-size:calc(var(--fs)*5.4*var(--u));font-weight:800;color:#FFE08A;margin-top:calc(.6*var(--u))}
+.cl-cd{display:inline-block;margin-top:calc(1.2*var(--u));background:rgba(0,0,0,.25);border-radius:99px;padding:calc(.5*var(--u)) calc(2.4*var(--u));font-size:calc(var(--fs)*3*var(--u))}
+.cl-cd b{font-size:1.4em;color:#FFE08A}
+.closed-slide p{font-size:calc(var(--fs)*3.2*var(--u));opacity:.95;margin-top:calc(1.4*var(--u));font-family:'Sarabun'}
+.cl-open{display:inline-block;margin-top:calc(2*var(--u));background:#fff;color:#1E5E3A;border-radius:calc(1.4*var(--u));padding:calc(.9*var(--u)) calc(2.6*var(--u));font-weight:800;font-size:calc(var(--fs)*3*var(--u))}
 @media print{body.print{background:#fff}.pbar{display:none}.sheet,.tents{margin:0;box-shadow:none;width:auto;min-height:auto;page-break-after:always}@page{size:A4;margin:0}}
 /* ---------- ป้ายที่ออกแบบเอง (อัปโหลดทั้งภาพ) ---------- */
 .poster{flex:1;position:relative;min-height:0;margin:0 0 calc(.5*var(--u));border-radius:calc(2*var(--u));overflow:hidden;background:#000}
 .poster img{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
 .on .poster img{animation:posterIn 1s cubic-bezier(.2,.8,.2,1) both}
 @keyframes posterIn{0%{opacity:0;transform:scale(1.04)}100%{opacity:1;transform:none}}
-body.fullslide #stage{grid-template-rows:0 minmax(0,1fr) 0}
+body.fullslide #stage{grid-template-rows:0 0 minmax(0,1fr) 0}
+body.fullslide .clbar{display:none}
 body.fullslide header,body.fullslide footer{visibility:hidden;overflow:hidden;padding:0}
 .slide.full{padding:0}.slide.full .poster{margin:0;border-radius:0}
 </style>
@@ -339,6 +361,30 @@ function fetchDisplay(ok, fail) {
 /** ลิงก์เมนูลูกค้า: ถ้ามีเว็บสาธารณะ (publicUrl) ใช้ menu.html ของเว็บนั้น */
 function publicBase(cfg) { var u = String((cfg && cfg.publicUrl) || '').trim(); return u ? u.replace(/[?#].*$/, '').replace(/index\.html$/, '').replace(/\/?$/, '/') : ''; }
 function menuLink(D) { var pb = publicBase(D.config); return pb ? pb + 'menu.html' : (D.appUrl || '') + '?view=menu'; }
+/* ---------- ประกาศวันหยุดร้าน ---------- */
+var TH_DAYN = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+var TH_MS2 = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function dObj(ds) { return new Date(String(ds).slice(0, 10) + 'T00:00:00'); }
+function thDay(ds, withDay) { var d = dObj(ds); return (withDay ? 'วัน' + TH_DAYN[d.getDay()] + 'ที่ ' : '') + d.getDate() + ' ' + TH_MS2[d.getMonth()]; }
+function closureRange(c) {
+  var a = dObj(c.start), b = dObj(c.end || c.start);
+  if (+a === +b) return thDay(c.start, true) + ' ' + (a.getFullYear() + 543);
+  if (a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear()) return a.getDate() + '–' + b.getDate() + ' ' + TH_MS2[a.getMonth()] + ' ' + (a.getFullYear() + 543);
+  return thDay(c.start) + ' – ' + thDay(c.end) + ' ' + (b.getFullYear() + 543);
+}
+/** ประกาศหยุดที่ควรแสดงวันนี้: อยู่ในช่วงประกาศล่วงหน้า (announce วัน, ค่าเริ่มต้น 7) จนถึงวันสุดท้ายที่หยุด */
+function closureNow(list, ds) {
+  ds = ds || ymd();
+  var hit = (list || []).filter(function (c) {
+    if (!c.start) return false;
+    var pre = new Date(dObj(c.start)); pre.setDate(pre.getDate() - (parseInt(c.announce, 10) >= 0 && c.announce !== '' ? parseInt(c.announce, 10) : 7));
+    return ymd(pre) <= ds && (c.end || c.start) >= ds;
+  }).sort(function (a, b) { return a.start < b.start ? -1 : 1; })[0];
+  if (!hit) return null;
+  var re = dObj(hit.end || hit.start); re.setDate(re.getDate() + 1);
+  var days = Math.round((dObj(hit.start) - dObj(ds)) / 864e5);
+  return { c: hit, today: hit.start <= ds, days: days, range: closureRange(hit), reopen: 'เปิดตามปกติ ' + thDay(ymd(re), true), msg: hit.msg || hit.greeting || 'ขออภัยในความไม่สะดวก' };
+}
 function ymd(d) { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 /** ช่วงเวลาที่ใช้อยู่ตอนนี้ จาก config.slots = [{name, from, to, cats:[..], only:'Y', focus:'ร้อน'}] */
 function activeSlot(cfg, now) {
@@ -381,7 +427,25 @@ function load(first) {
     if (P.view === 'print') buildPrint(); else if (P.view === 'qr') buildQr(); else build(first);
   }, e => { if (first) document.getElementById('root').innerHTML = `<div class="msg">โหลดข้อมูลไม่สำเร็จ<br><small>${esc(e.message)}</small></div>`; });
 }
-let FEST = null, SLOT = null, DAYKEY = '', SLOTKEY = '', FS = 1;
+let FEST = null, SLOT = null, DAYKEY = '', SLOTKEY = '', FS = 1, CLOSE = null;
+/** ลำดับหน้าบนจอ: config.slideOrder = [{k, on}] • ไม่ได้ตั้ง = ค่าเริ่มต้น • หมวดใหม่ต่อท้ายอัตโนมัติ */
+function slideOrder(c, cats) {
+  let o = []; try { o = JSON.parse(c.slideOrder || '[]') || []; } catch (e) { o = []; }
+  const ck = cats.map(k => 'cat:' + k.name);
+  if (!o.length) o = ['closed', 'fest', ck[0], 'top', 'spot', 'poster', 'promo'].concat(ck.slice(1)).filter(Boolean).map(k => ({ k }));
+  const have = new Set(o.map(x => x.k));
+  ['closed', 'fest', 'top', 'spot', 'poster', 'promo'].concat(ck).forEach(k => { if (!have.has(k)) o.push({ k }); });
+  return o;
+}
+function closedHtml(x) {
+  return `<div class="closed-slide"><div class="cl-in">
+    <div class="cl-ic">📢</div><div class="cl-k">ประกาศจากร้าน</div>
+    <h2>${x.today ? 'วันนี้ร้านหยุด' : 'ร้านหยุด'}</h2>
+    <div class="cl-d">${esc(x.range)}</div>
+    ${!x.today && x.days > 0 ? `<div class="cl-cd">อีก <b>${x.days}</b> วัน</div>` : ''}
+    <p>${esc(x.msg)}</p>
+    <div class="cl-open">✅ ${esc(x.reopen)}</div></div></div>`;
+}
 function theme() {
   const c = D.config, r = document.documentElement.style;
   FEST = P.view === 'print' || P.view === 'qr' ? null : pickTheme(c, D.events, ymd(), P.theme);
@@ -421,43 +485,59 @@ function build() {
   const sc = SLOT && (SLOT.cats || []).length ? SLOT.cats : null;
   let cats = D.categories.filter(k => !P.cat || k.name === P.cat);
   if (sc) cats = SLOT.only === 'Y' ? cats.filter(k => sc.indexOf(k.name) > -1) : cats.filter(k => sc.indexOf(k.name) > -1).concat(cats.filter(k => sc.indexOf(k.name) < 0));
-  cats.forEach(k => {
-    const items = sortedMenu(k.name); if (!items.length) return;
+  /* ---- สร้างแต่ละบล็อก แล้วเรียงตาม config.slideOrder ---- */
+  const B = {};
+  const catPages = k => {
+    const out = [], items = sortedMenu(k.name); if (!items.length) return out;
     const withImg = items.filter(m => m.image).length >= items.length / 2;
     if (withImg) {
-      const cols = land ? 4 : 2, per = cols * (land ? 2 : 4);
-      const pages = chunk(items, per);
-      pages.forEach((pg, i) => {
-        const cc = land ? Math.min(cols, Math.max(2, pg.length > 4 ? Math.ceil(pg.length / 2) : pg.length)) : cols;
-        slides.push(slideWrap(k, i, pages.length, `<div class="grid" style="grid-template-columns:repeat(${cc},1fr);grid-template-rows:repeat(${Math.ceil(pg.length / cc)},1fr)">${pg.map(cardHtml).join('')}</div>`));
+      const cols = land ? 4 : 2, per = Math.max(2, Math.round(cols * (land ? 2 : 4) / Math.max(1, FS)));
+      chunk(items, per).forEach((pg, i, all) => {
+        const cc = land ? Math.min(cols, Math.max(2, pg.length > 4 ? Math.ceil(pg.length / 2) : pg.length)) : Math.min(cols, pg.length > 1 ? cols : 1);
+        out.push(slideWrap(k, i, all.length, `<div class="grid" style="grid-template-columns:repeat(${cc},1fr);grid-template-rows:repeat(${Math.ceil(pg.length / cc)},1fr)">${pg.map(cardHtml).join('')}</div>`));
       });
     } else {
       const per = Math.max(5, Math.round((land ? 16 : 13) / Math.max(1, FS))), colsN = land ? 2 : 1;
-      const pages = chunk(items, per);
-      pages.forEach((pg, i) => slides.push(slideWrap(k, i, pages.length,
+      chunk(items, per).forEach((pg, i, all) => out.push(slideWrap(k, i, all.length,
         `<div class="list" style="grid-template-columns:repeat(${colsN},1fr);grid-template-rows:repeat(${Math.ceil(pg.length / colsN)},auto)">${pg.map(listHtml).join('')}</div>`)));
     }
-  });
+    return out;
+  };
+  cats.forEach(k => B['cat:' + k.name] = catPages(k));
   const spotSec = Math.max(3, num(P.spot) || num(c.spotSeconds) || 5);
-  const front = [];
   const n = Math.max(3, Math.min(10, num(c.topN) || 5));
   const top = D.top.map(t => D.menu.find(m => m.name === t)).filter(Boolean).slice(0, n);
-  if (c.showTop !== 'N' && !P.cat && top.length >= 3) front.push(topHtml(top, land));
+  B.top = c.showTop !== 'N' && !P.cat && top.length >= 3 ? [topHtml(top, land)] : [];
   const topS = D.top.map(t => D.menu.find(m => m.name === t)).filter(m => m && !m.soldOut && inSlot(m));
   const mode = P.spotMode || c.spotMode || 'top';
+  B.spot = [];
   if (mode !== 'off') {
     let list = mode === 'all' ? D.menu.filter(m => m.image && !m.soldOut && inSlot(m) && (!P.cat || m.category === P.cat)).sort((a, b) => rankOf(a.name) - rankOf(b.name)) : (P.cat ? [] : topS.slice(0, Math.max(3, n)));
     if (sc && list.length < 3) list = list.concat(D.menu.filter(m => m.image && !m.soldOut && inSlot(m) && list.indexOf(m) < 0).sort((a, b) => rankOf(a.name) - rankOf(b.name)).slice(0, 3 - list.length));
-    list.forEach(m => { const r = rankOf(m.name); front.push({ html: spotHtml(m, r < 10 ? r : null, land), sec: spotSec, cls:'spotslide' }); });
+    list.forEach(m => { const r = rankOf(m.name); B.spot.push({ html: spotHtml(m, r < 10 ? r : null, land), sec: spotSec, cls:'spotslide' }); });
   }
-  slides.splice(Math.min(1, slides.length), 0, ...front);
   const promos = D.promos.filter(p => promoNow(p) && p.kind !== 'poster');
   const posters = D.promos.filter(p => promoNow(p) && p.kind === 'poster' && (p.image || p.image2));
-  if (c.showPromos !== 'N' && !P.cat) promos.forEach((p, i) => slides.splice(Math.min(slides.length, front.length + 2 + i * 3), 0, promoHtml(p)));
-  if (!P.cat) posters.forEach((p, i) => slides.splice(Math.min(slides.length, front.length + 1 + i * 2), 0, { html: posterHtml(p, land), sec: Math.max(3, num(p.sec) || 8), cls: p.full === 'Y' ? 'full' : '' }));
-  if (FEST && !P.cat) slides.unshift({ html: festHtml(), sec: 8, cls:'festslide' });
+  B.promo = c.showPromos !== 'N' && !P.cat ? promos.map(promoHtml) : [];
+  B.poster = P.cat ? [] : posters.map(p => ({ html: posterHtml(p, land), sec: Math.max(3, num(p.sec) || 8), cls: p.full === 'Y' ? 'full' : '' }));
+  B.fest = FEST && !P.cat ? [{ html: festHtml(), sec: 8, cls:'festslide' }] : [];
+  CLOSE = P.view === 'print' ? null : closureNow(D.closures);
+  B.closed = CLOSE ? [{ html: closedHtml(CLOSE), sec: 10, cls:'closedslide' }] : [];
+  const order = slideOrder(c, cats);
+  let catsDone = false;
+  order.forEach(o => {
+    if (o.k.indexOf('cat:') === 0) {
+      if (sc) { if (catsDone) return; catsDone = true; cats.forEach(k => { const it = order.find(x => x.k === 'cat:' + k.name); if (!it || it.on !== false) slides.push(...(B['cat:' + k.name] || [])); }); return; }
+      if (o.on === false) return; slides.push(...(B[o.k] || [])); return;
+    }
+    if (o.on !== false) slides.push(...(B[o.k] || []));
+  });
+  if (P.cat && !slides.length) cats.forEach(k => slides.push(...(B['cat:' + k.name] || [])));
+  /* ประกาศหยุดร้าน: แทรกซ้ำทุก ๆ 6 หน้า ให้ลูกค้าเห็นบ่อย */
+  if (CLOSE && order.find(o => o.k === 'closed' && o.on !== false)) for (let i = 7; i < slides.length; i += 7) slides.splice(i, 0, B.closed[0]);
 
   const tickItems = [];
+  if (CLOSE) tickItems.push(`📢 <b>${CLOSE.today ? 'วันนี้ร้านหยุด' : 'ร้านหยุด ' + esc(CLOSE.range)}</b> ${esc(CLOSE.msg)} • ${esc(CLOSE.reopen)}`);
   if (FEST) tickItems.push(`${FEST.t.fx[0]} <b>${esc(FEST.greet)}</b> ${FEST.t.fx[1] || ''}`);
   const so = D.menu.filter(m => m.soldOut);
   if (so.length) tickItems.push(`🙏 ขออภัย วันนี้ <b>${so.slice(0, 4).map(m => esc(menuName(m))).join(', ')}</b>${so.length > 4 ? ` และอีก ${so.length - 4} เมนู` : ''} หมดแล้ว`);
@@ -474,18 +554,29 @@ function build() {
   document.getElementById('root').innerHTML = `
     <div id="stage">
     <header><div class="logo-wrap"><div class="steam"><i></i><i></i><i></i></div><div class="logo">${logo}</div></div>
-      <div><div class="shop">${esc(c.shopName)}</div><div class="tag">${esc(c.tagline)}</div>
+      <div class="hname"><div class="shop" id="shopName">${esc(c.shopName)}</div><div class="tag">${esc(c.tagline)}</div>
       ${FEST ? `<div class="festchip">${FEST.t.fx[0]} ${esc(FEST.greet)}</div>` : SLOT ? `<div class="slotchip">⏰ ${esc(SLOT.name)}</div>` : ''}</div>
       <div class="hr"><div class="clock"><b id="clk"></b><span id="dt"></span></div>
       ${c.showQr !== 'N' && D.appUrl ? `<div class="qr"><img src="${qrSrc(menuUrl(), 240)}" alt=""><span><b>สแกนดูเมนู</b>บนมือถือ</span></div>` : ''}</div></header>
+    <div class="clbar ${CLOSE ? 'on' : ''}">${CLOSE ? `📢 <b>${CLOSE.today ? 'วันนี้ร้านหยุด' : 'ร้านหยุด ' + esc(CLOSE.range)}</b><span>${esc(CLOSE.reopen)}</span>` : ''}</div>
     <div id="slides">${slides.map(s => typeof s === 'string' ? `<section class="slide">${s}</section>` : `<section class="slide ${s.cls || ''}" data-sec="${s.sec || ''}">${s.html}</section>`).join('') || '<div class="msg">ยังไม่มีเมนูที่แสดงบนจอ</div>'}<div class="prog" id="prog"></div></div>
     <footer><div class="ticker"><div class="tk" style="--tk:${Math.max(25, tickItems.join('').length / 5)}s">${tickHtml}${tickHtml}</div></div><div class="dots">${slides.map(() => '<i></i>').join('')}</div></footer></div>
     ${P.preview ? '' : '<button class="fs" onclick="fullscreen()">⛶ เต็มจอ</button>'}`;
   if (idx >= slides.length) idx = 0;
   show(idx);
   tick();
+  fitName();
   if (!lite) startFx();
 }
+/** ชื่อร้านบรรทัดเดียว: ย่อขนาดอัตโนมัติถ้ายาวเกินพื้นที่ */
+function fitName() {
+  const el = document.getElementById('shopName'); if (!el) return;
+  el.style.fontSize = '';
+  const base = parseFloat(getComputedStyle(el).fontSize);
+  let f = base;
+  for (let i = 0; i < 30 && el.scrollWidth > el.clientWidth + 1 && f > base * .45; i++) { f *= .94; el.style.fontSize = f + 'px'; }
+}
+addEventListener('resize', () => { clearTimeout(fitName.t); fitName.t = setTimeout(fitName, 200); });
 function festHtml() {
   const t = FEST.t;
   return `<div class="fest-slide"><div><div class="fe">${t.fx[0]}</div><h2>${esc(FEST.greet)}</h2>

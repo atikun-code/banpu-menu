@@ -93,6 +93,14 @@ main{padding:6px 16px 40px}
 .item.so .prices{text-decoration:line-through}
 .bcard.so .im{filter:grayscale(1);opacity:.6}
 .soldnote{margin-top:10px;background:#3A2E27;color:#fff;border-radius:12px;padding:8px 12px;font-size:14px}
+.closed-card{margin:-6px 16px 10px;position:relative;z-index:3;display:flex;gap:12px;align-items:flex-start;background:linear-gradient(135deg,#C0392B,#E67E22);color:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 10px 24px -8px rgba(192,57,43,.55);animation:ccIn .6s cubic-bezier(.2,.9,.3,1.2) both}
+.closed-card .cc-ic{font-size:34px;line-height:1;animation:bob 2.4s ease-in-out infinite}
+.closed-card b{display:block;font-family:'Prompt';font-size:20px;line-height:1.25}
+.cc-k{display:inline-block;background:#fff;color:#C0392B;border-radius:99px;padding:1px 10px;font-size:12px;font-weight:700;margin-bottom:4px}
+.cc-cd{display:inline-block;margin-top:4px;background:rgba(0,0,0,.22);border-radius:99px;padding:1px 10px;font-size:13px}
+.cc-m{font-size:14px;opacity:.95;margin-top:4px}
+.cc-o{display:inline-block;margin-top:8px;background:#fff;color:#1E5E3A;border-radius:10px;padding:4px 10px;font-weight:700;font-size:14px}
+@keyframes ccIn{0%{opacity:0;transform:translateY(-8px) scale(.97)}100%{opacity:1;transform:none}}
 .fest{margin:-6px 16px 0;position:relative;z-index:2;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--acc),#fff);color:#2B1D14;border-radius:16px;padding:10px 14px;font-family:'Prompt';font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.12)}
 .fest .fe{font-size:26px;animation:bob 2.4s ease-in-out infinite}
 .fest small{display:block;font-weight:400;font-family:'Sarabun';opacity:.75}
@@ -188,6 +196,30 @@ function fetchDisplay(ok, fail) {
 /** ลิงก์เมนูลูกค้า: ถ้ามีเว็บสาธารณะ (publicUrl) ใช้ menu.html ของเว็บนั้น */
 function publicBase(cfg) { var u = String((cfg && cfg.publicUrl) || '').trim(); return u ? u.replace(/[?#].*$/, '').replace(/index\.html$/, '').replace(/\/?$/, '/') : ''; }
 function menuLink(D) { var pb = publicBase(D.config); return pb ? pb + 'menu.html' : (D.appUrl || '') + '?view=menu'; }
+/* ---------- ประกาศวันหยุดร้าน ---------- */
+var TH_DAYN = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+var TH_MS2 = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function dObj(ds) { return new Date(String(ds).slice(0, 10) + 'T00:00:00'); }
+function thDay(ds, withDay) { var d = dObj(ds); return (withDay ? 'วัน' + TH_DAYN[d.getDay()] + 'ที่ ' : '') + d.getDate() + ' ' + TH_MS2[d.getMonth()]; }
+function closureRange(c) {
+  var a = dObj(c.start), b = dObj(c.end || c.start);
+  if (+a === +b) return thDay(c.start, true) + ' ' + (a.getFullYear() + 543);
+  if (a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear()) return a.getDate() + '–' + b.getDate() + ' ' + TH_MS2[a.getMonth()] + ' ' + (a.getFullYear() + 543);
+  return thDay(c.start) + ' – ' + thDay(c.end) + ' ' + (b.getFullYear() + 543);
+}
+/** ประกาศหยุดที่ควรแสดงวันนี้: อยู่ในช่วงประกาศล่วงหน้า (announce วัน, ค่าเริ่มต้น 7) จนถึงวันสุดท้ายที่หยุด */
+function closureNow(list, ds) {
+  ds = ds || ymd();
+  var hit = (list || []).filter(function (c) {
+    if (!c.start) return false;
+    var pre = new Date(dObj(c.start)); pre.setDate(pre.getDate() - (parseInt(c.announce, 10) >= 0 && c.announce !== '' ? parseInt(c.announce, 10) : 7));
+    return ymd(pre) <= ds && (c.end || c.start) >= ds;
+  }).sort(function (a, b) { return a.start < b.start ? -1 : 1; })[0];
+  if (!hit) return null;
+  var re = dObj(hit.end || hit.start); re.setDate(re.getDate() + 1);
+  var days = Math.round((dObj(hit.start) - dObj(ds)) / 864e5);
+  return { c: hit, today: hit.start <= ds, days: days, range: closureRange(hit), reopen: 'เปิดตามปกติ ' + thDay(ymd(re), true), msg: hit.msg || hit.greeting || 'ขออภัยในความไม่สะดวก' };
+}
 function ymd(d) { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 /** ช่วงเวลาที่ใช้อยู่ตอนนี้ จาก config.slots = [{name, from, to, cats:[..], only:'Y', focus:'ร้อน'}] */
 function activeSlot(cfg, now) {
@@ -226,6 +258,7 @@ const sig = d => JSON.stringify([d.config, d.menu, d.categories, d.top, d.promos
 function boot() {
   if (!D) try { const c = localStorage.getItem('bp_menu'); if (c) { D = JSON.parse(c); lastSig = sig(D); render(); } } catch (e) {}
   fetchDisplay(d => {
+    if (!window.BP_API && publicBase(d.config) && !/noredir/.test(location.search)) { goPublic(publicBase(d.config) + 'menu.html'); return; }
     const s2 = sig(d); D = d;
     try { localStorage.setItem('bp_menu', JSON.stringify(d)); } catch (e) {}
     if (s2 !== lastSig) { lastSig = s2; const y = scrollY; render(); if (y) scrollTo(0, y); }
@@ -248,8 +281,15 @@ function imgBox(m, cls) {
     : `<img class="pfg" src="${src}" loading="lazy" decoding="async" alt="">`;
   return `<div class="${cls}" style="background:radial-gradient(circle at 50% 40%,${esc(k.color)}33,${esc(k.color)}11)">${im || esc(k.emoji)}</div>`;
 }
+/** เปิดจากลิงก์ Google (มีแถบฟ้า) แต่ร้านมีเว็บสาธารณะแล้ว → พาไปเว็บสาธารณะ */
+function goPublic(url) {
+  $('#app').innerHTML = `<div class="load" style="padding:40px 20px;text-align:center"><div style="font-size:42px">☕</div><p>กำลังเปิดเมนู…</p><a href="${esc(url)}" target="_top" style="display:inline-block;margin-top:12px;background:var(--pri);color:#fff;padding:12px 22px;border-radius:14px;text-decoration:none;font-family:'Prompt'">เปิดเมนู ›</a></div>`;
+  try { window.top.location.replace(url); } catch (e) { try { window.open(url, '_top'); } catch (x) {} }
+}
 function openStatus(c) {
   const d = new Date(), t = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  const cl = closureNow(D.closures);
+  if (cl && cl.today) return { open:false, text:`วันนี้ร้านหยุด • ${cl.reopen}` };
   const closedDays = String(c.closedDay || '').split(',').filter(x => x !== '').map(Number);
   if (closedDays.includes(d.getDay())) return { open:false, text:`วันนี้ร้านหยุด (หยุดทุกวัน${closedDays.map(x => DAYS[x]).join(', ')})` };
   if (!c.openTime || !c.closeTime) return null;
@@ -285,6 +325,7 @@ function render() {
       <div><h1>${esc(c.shopName)}</h1><p>${esc(c.tagline)}</p>${st ? `<span class="status ${st.open ? '' : 'closed'}"><i></i>${esc(st.text)}</span>` : ''}</div></div>
     ${acts.length ? `<div class="acts">${acts.join('')}</div>` : ''}
   </header>
+  ${(() => { const cl = closureNow(D.closures); return cl ? `<div class="closed-card"><div class="cc-ic">📢</div><div><div class="cc-k">ประกาศจากร้าน</div><b>${cl.today ? 'วันนี้ร้านหยุด' : 'ร้านหยุด ' + esc(cl.range)}</b>${!cl.today && cl.days > 0 ? `<span class="cc-cd">อีก ${cl.days} วัน</span>` : ''}<div class="cc-m">${esc(cl.msg)}</div><div class="cc-o">✅ ${esc(cl.reopen)}</div></div></div>` : ''; })()}
   ${fest ? `<div class="fest"><span class="fe">${fest.t.fx[0]}</span><div>${esc(fest.greet)}<small>${esc(fest.name)} • ${esc(c.shopName)}</small></div></div>` : ''}
   <div class="bar" id="bar">
     <label class="search">🔍<input id="q" placeholder="ค้นหาเมนู เช่น ชาไทย ลาเต้" autocomplete="off"></label>
