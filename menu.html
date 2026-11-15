@@ -195,7 +195,11 @@ function fetchDisplay(ok, fail) {
 }
 /** ลิงก์เมนูลูกค้า: ถ้ามีเว็บสาธารณะ (publicUrl) ใช้ menu.html ของเว็บนั้น */
 function publicBase(cfg) { var u = String((cfg && cfg.publicUrl) || '').trim(); return u ? u.replace(/[?#].*$/, '').replace(/index\.html$/, '').replace(/\/?$/, '/') : ''; }
-function menuLink(D) { var pb = publicBase(D.config); return pb ? pb + 'menu.html' : (D.appUrl || '') + '?view=menu'; }
+function menuLink(D) {
+  /* เปิดจากเว็บสาธารณะ (GitHub) → QR ชี้ menu.html ของเว็บเดียวกันเสมอ ไม่ต้องพึ่งการตั้งค่า */
+  if (window.BP_API && location.protocol.indexOf('http') === 0) return location.origin + location.pathname.replace(/[^\/]*$/, '') + 'menu.html';
+  var pb = publicBase(D.config); return pb ? pb + 'menu.html' : (D.appUrl || '') + '?view=menu';
+}
 /* ---------- ประกาศวันหยุดร้าน ---------- */
 var TH_DAYN = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 var TH_MS2 = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -267,7 +271,7 @@ function boot() {
 const cat = n => D.categories.find(c => c.name === n) || { emoji:'☕', color:'#6B4226' };
 const nm = m => m.displayName || m.name;
 const rank = n => { const i = D.top.indexOf(n); return i < 0 ? 999 : i; };
-const prices = m => [['ร้อน', m.priceHot], ['เย็น', m.priceIced], ['ปั่น', m.priceBlend], ['', m.priceStd]].filter(p => num(p[1]) > 0);
+const prices = m => { const v = [['ร้อน', m.priceHot], ['เย็น', m.priceIced], ['ปั่น', m.priceBlend]].filter(p => num(p[1]) > 0); return v.length ? v : (num(m.priceStd) > 0 ? [['', m.priceStd]] : []); };
 const minPrice = m => { const p = prices(m).map(x => num(x[1])); return p.length ? Math.min(...p) : 0; };
 function priceHtml(m) {
   if (D.config.showPrices === 'N') return '';

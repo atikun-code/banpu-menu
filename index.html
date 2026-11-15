@@ -66,6 +66,8 @@ header{display:flex;align-items:center;gap:calc(2.2*var(--u));padding:calc(2.4*v
 
 /* card grid */
 .grid{flex:1;display:grid;gap:calc(2*var(--u));min-height:0}
+.grid.fx{display:flex;flex-wrap:wrap;justify-content:center;align-content:stretch}
+.grid.fx>.card{width:calc((100% - (var(--c) - 1) * 2 * var(--u)) / var(--c));height:calc((100% - (var(--r) - 1) * 2 * var(--u)) / var(--r))}
 .card{background:var(--card);color:var(--ink);border-radius:calc(2.6*var(--u));overflow:hidden;display:flex;flex-direction:column;box-shadow:0 calc(1*var(--u)) calc(3.5*var(--u)) rgba(0,0,0,.4);min-height:0;position:relative;opacity:0}
 .on .card{animation:cardIn .85s cubic-bezier(.2,.9,.25,1.15) both;animation-delay:calc(.5s + var(--i) * .11s)}
 @keyframes cardIn{0%{opacity:0;transform:translateY(6vmin) scale(.88) rotate(-2deg)}100%{opacity:1;transform:none}}
@@ -362,7 +364,11 @@ function fetchDisplay(ok, fail) {
 }
 /** ลิงก์เมนูลูกค้า: ถ้ามีเว็บสาธารณะ (publicUrl) ใช้ menu.html ของเว็บนั้น */
 function publicBase(cfg) { var u = String((cfg && cfg.publicUrl) || '').trim(); return u ? u.replace(/[?#].*$/, '').replace(/index\.html$/, '').replace(/\/?$/, '/') : ''; }
-function menuLink(D) { var pb = publicBase(D.config); return pb ? pb + 'menu.html' : (D.appUrl || '') + '?view=menu'; }
+function menuLink(D) {
+  /* เปิดจากเว็บสาธารณะ (GitHub) → QR ชี้ menu.html ของเว็บเดียวกันเสมอ ไม่ต้องพึ่งการตั้งค่า */
+  if (window.BP_API && location.protocol.indexOf('http') === 0) return location.origin + location.pathname.replace(/[^\/]*$/, '') + 'menu.html';
+  var pb = publicBase(D.config); return pb ? pb + 'menu.html' : (D.appUrl || '') + '?view=menu';
+}
 /* ---------- ประกาศวันหยุดร้าน ---------- */
 var TH_DAYN = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 var TH_MS2 = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -464,7 +470,8 @@ const catInfo = n => D.categories.find(c => c.name === n) || { emoji:'☕', colo
 const menuName = m => m.displayName || m.name;
 const pic = src => D.config.imgFit === 'cover' ? `<img src="${esc(sz(src, 1600))}" decoding="async" alt="">` : `<img class="pfg" src="${esc(sz(src, 1600))}" decoding="async" alt="">`;
 const FULL = () => D.config.imgFit !== 'cover';
-const prices = m => [['ร้อน', m.priceHot], ['เย็น', m.priceIced], ['ปั่น', m.priceBlend], ['', m.priceStd]].filter(p => num(p[1]) > 0);
+/* ราคาปกติแสดงเฉพาะเมนูที่ไม่มีแบบ ร้อน/เย็น/ปั่น (กันราคาซ้ำ เช่น ปั่น 75 ราคา 75) */
+const prices = m => { const v = [['ร้อน', m.priceHot], ['เย็น', m.priceIced], ['ปั่น', m.priceBlend]].filter(p => num(p[1]) > 0); return v.length ? v : (num(m.priceStd) > 0 ? [['', m.priceStd]] : []); };
 function priceChips(m, i) {
   if (D.config.showPrices === 'N') return '';
   const ps = prices(m); if (!ps.length) return '';
@@ -493,10 +500,12 @@ function build() {
     const out = [], items = sortedMenu(k.name); if (!items.length) return out;
     const withImg = items.filter(m => m.image).length >= items.length / 2;
     if (withImg) {
-      const cols = land ? 4 : 2, per = Math.max(2, Math.round(cols * (land ? 2 : 4) / Math.max(1, FS)));
-      chunk(items, per).forEach((pg, i, all) => {
-        const cc = land ? Math.min(cols, Math.max(2, pg.length > 4 ? Math.ceil(pg.length / 2) : pg.length)) : Math.min(cols, pg.length > 1 ? cols : 1);
-        out.push(slideWrap(k, i, all.length, `<div class="grid" style="grid-template-columns:repeat(${cc},1fr);grid-template-rows:repeat(${Math.ceil(pg.length / cc)},1fr)">${pg.map(cardHtml).join('')}</div>`));
+      const lay = cardPlan(items.length);
+      let at = 0;
+      lay.sizes.forEach((cnt, i) => {
+        const pg = items.slice(at, at + cnt); at += cnt;
+        const g = fitGrid(cnt);
+        out.push(slideWrap(k, i, lay.sizes.length, `<div class="grid fx" style="--c:${g.c};--r:${g.r}">${pg.map(cardHtml).join('')}</div>`));
       });
     } else {
       const per = Math.max(5, Math.round((land ? 16 : 13) / Math.max(1, FS))), colsN = land ? 2 : 1;
@@ -524,7 +533,7 @@ function build() {
   B.poster = P.cat ? [] : posters.map(p => ({ html: posterHtml(p, land), sec: Math.max(3, num(p.sec) || 8), cls: p.full === 'Y' ? 'full' : '' }));
   B.fest = FEST && !P.cat ? [{ html: festHtml(), sec: 8, cls:'festslide' }] : [];
   CLOSE = P.view === 'print' ? null : closureNow(D.closures);
-  B.closed = CLOSE ? [{ html: closedHtml(CLOSE), sec: 10, cls:'closedslide' }] : [];
+  B.closed = CLOSE && !P.cat ? [{ html: closedHtml(CLOSE), sec: 10, cls:'closedslide' }] : [];
   const order = slideOrder(c, cats);
   let catsDone = false;
   order.forEach(o => {
@@ -584,6 +593,36 @@ function festHtml() {
   return `<div class="fest-slide"><div><div class="fe">${t.fx[0]}</div><h2>${esc(FEST.greet)}</h2>
     <p>${esc(FEST.name)} • ${esc(D.config.shopName)}</p>
     <div class="fest-row">${t.fx.slice(1, 5).map((e, i) => `<span style="--i:${i}">${e}</span>`).join('')}</div></div></div>`;
+}
+/* ---------- จัดการ์ดให้เต็มพื้นที่: เลือกจำนวนคอลัมน์/แถวที่ทำให้กรอบรูปใกล้สี่เหลี่ยมจัตุรัสที่สุด และไม่มีช่องว่าง ---------- */
+function areaWH() {
+  const u = Math.min(innerWidth, innerHeight) / 100;
+  return { u, W: innerWidth - 7.2 * u, H: innerHeight - (FS * 8 + 30) * u };
+}
+function fitGrid(count) {
+  const { u, W, H } = areaWH(), gap = 2 * u;
+  const fp = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fp')) || 1;
+  const tH = u * (3.4 * FS + 2.9 * FS * fp + 4.6);
+  let best = null;
+  for (let c = 1; c <= 6; c++) for (let r = 1; r <= 5; r++) {
+    if (c * r < count || c * r - count >= c) continue;
+    const cw = (W - gap * (c - 1)) / c, ch = (H - gap * (r - 1)) / r, ih = ch - tH;
+    if (ih < ch * .42 || cw < 22 * u) continue;
+    const ratio = ih / cw, sq = ratio > 1 ? 1 / ratio : ratio;
+    const score = sq - (c * r - count) * .15;
+    if (!best || score > best.score) best = { c, r, score, sq };
+  }
+  return best || { c: Math.min(count, isLand() ? 4 : 2), r: Math.ceil(count / Math.min(count, isLand() ? 4 : 2)), sq: 0, score: 0 };
+}
+function cardPlan(n) {
+  let best = null;
+  for (let per = 2; per <= 12; per++) {
+    const pages = Math.ceil(n / per), sizes = [];
+    for (let i = 0; i < pages; i++) sizes.push(Math.floor(n / pages) + (i < n % pages ? 1 : 0));
+    const sc = sizes.reduce((a, x) => a + fitGrid(x).score, 0) / pages + Math.min(per, n) * .04 - pages * .04;
+    if (!best || sc > best.sc) best = { sc, sizes };
+  }
+  return best;
 }
 function slideWrap(k, i, n, inner) {
   return `<div class="s-title"><span class="em">${esc(k.emoji || '☕')}</span><h2>${esc(k.name)}</h2><span class="line"></span>${n > 1 ? `<span class="pg">${i + 1}/${n}</span>` : ''}</div>${inner}`;
