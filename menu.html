@@ -59,6 +59,8 @@ main{padding:6px 16px 40px}
 .promo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .promo::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.7),transparent 70%)}
 .promo .tx{position:relative;z-index:1}
+.promo.poster-m{padding:0;background:#000;min-height:0;align-items:stretch}.promo.poster-m::after{display:none}
+.promo.poster-m img{position:static;width:100%;height:auto;max-height:70vh;object-fit:contain;display:block}
 .promo h3{font-size:20px;line-height:1.2}
 .promo .pp{display:inline-block;margin-top:6px;background:var(--acc);color:#2B1D14;font-family:'Prompt';font-weight:700;padding:2px 12px;border-radius:99px}
 .promo .k{font-size:12px;background:#fff;color:var(--pri);border-radius:99px;padding:1px 9px;font-weight:700;display:inline-block;margin-bottom:6px}
@@ -291,7 +293,7 @@ function render() {
   </div>
   <main id="main">
     ${so.length ? `<div class="soldnote">🙏 วันนี้หมดแล้ว: ${so.map(m => esc(nm(m))).join(', ')}</div>` : ''}
-    ${D.promosNow.length ? `<section class="sec" id="s-promo"><div class="sec-h"><h2>🎉 โปรโมชัน</h2></div><div class="promos">${D.promosNow.map(p => `<div class="promo">${p.image ? `<img src="${esc(sz(p.image, 900))}" decoding="async" alt="">` : ''}
+    ${D.promosNow.length ? `<section class="sec" id="s-promo"><div class="sec-h"><h2>🎉 โปรโมชัน</h2></div><div class="promos">${D.promosNow.map(p => p.kind === 'poster' ? `<div class="promo poster-m"><img src="${esc(sz(p.image2 || p.image, 900))}" decoding="async" alt="${esc(p.title || '')}"></div>` : `<div class="promo">${p.image ? `<img src="${esc(sz(p.image, 900))}" decoding="async" alt="">` : ''}
       <div class="tx"><span class="k">โปรโมชัน</span><h3>${esc(p.title)}</h3>${p.subtitle ? `<div>${esc(p.subtitle)}</div>` : ''}${p.price ? `<span class="pp">${esc(p.price)}</span>` : ''}</div></div>`).join('')}</div></section>` : ''}
     ${top.length >= 3 ? `<section class="sec" id="s-top"><div class="sec-h"><h2>🏆 ขายดีประจำเดือน</h2></div><div class="best">${top.map((m, i) => `<div class="bcard ${m.soldOut ? 'so' : ''}" data-item="${esc(m.name)}">
       <div class="rk">${i + 1}</div>${imgBox(m, 'im')}<div class="t"><div class="nm">${esc(nm(m))}</div>${minPrice(m) ? `<div class="fr">เริ่ม <b>${minPrice(m)}</b> บาท</div>` : ''}</div></div>`).join('')}</div></section>` : ''}
