@@ -287,6 +287,7 @@ body.fest .b3{background:var(--acc);opacity:.18}
 .tag{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* ---------- ประกาศวันหยุดร้าน ---------- */
 .clbar{display:none}
+#stage>header{grid-row:1}#stage>.clbar{grid-row:2}#stage>#slides{grid-row:3}#stage>footer{grid-row:4}
 .clbar.on{display:flex;align-items:center;gap:calc(1.4*var(--u));margin:0 calc(3.6*var(--u)) calc(1.2*var(--u));padding:calc(1*var(--u)) calc(2.2*var(--u));border-radius:calc(1.6*var(--u));background:linear-gradient(90deg,#C0392B,#E8A33D);color:#fff;font-size:calc(var(--fs)*2.5*var(--u));box-shadow:0 calc(.6*var(--u)) calc(2.4*var(--u)) rgba(192,57,43,.45);animation:clPulse 2.4s ease-in-out infinite}
 .clbar b{font-weight:800}.clbar span{margin-left:auto;opacity:.95;font-size:.85em;white-space:nowrap}
 @keyframes clPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}
@@ -310,6 +311,7 @@ body.fest .b3{background:var(--acc);opacity:.18}
 @keyframes posterIn{0%{opacity:0;transform:scale(1.04)}100%{opacity:1;transform:none}}
 body.fullslide #stage{grid-template-rows:0 0 minmax(0,1fr) 0}
 body.fullslide .clbar{display:none}
+#stage>header{grid-row:1}#stage>.clbar{grid-row:2}#stage>#slides{grid-row:3}#stage>footer{grid-row:4}
 body.fullslide header,body.fullslide footer{visibility:hidden;overflow:hidden;padding:0}
 .slide.full{padding:0}.slide.full .poster{margin:0;border-radius:0}
 </style>
