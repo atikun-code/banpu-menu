@@ -13,6 +13,8 @@
 :root{--pri:#6B4226;--acc:#E8A33D;--bg:#FBF6EF;--ink:#2B1D14;--muted:#8A7A6D;--line:#EFE4D8}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{scroll-padding-top:var(--spt,170px);-webkit-text-size-adjust:100%}
+button,a,.chip,[data-item],[data-go]{touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,.06);cursor:pointer}
+.chips{overscroll-behavior-x:contain}
 body{font-family:'Sarabun',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5;max-width:720px;margin:0 auto;min-height:100vh}
 h1,h2,h3,.chip,.btn,.price b,.nm{font-family:'Prompt',sans-serif}
 
@@ -43,7 +45,7 @@ h1,h2,h3,.chip,.btn,.price b,.nm{font-family:'Prompt',sans-serif}
 .search input{border:0;outline:0;font:inherit;padding:11px 0;flex:1;background:transparent;min-width:0}
 .chips{position:relative;display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 0 4px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex-shrink:0;padding:7px 14px;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:14px;color:var(--ink);cursor:pointer;white-space:nowrap;transition:background-color .2s,color .2s}
+.chip{flex-shrink:0;padding:9px 16px;min-height:40px;display:inline-flex;align-items:center;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:14px;color:var(--ink);cursor:pointer;white-space:nowrap;transition:background-color .2s,color .2s}
 .chip.on{background:var(--pri);color:#fff;border-color:var(--pri)}
 
 main{padding:6px 16px 40px}
@@ -126,7 +128,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 0 30px}
 /* sheet */
 .ov{position:fixed;inset:0;background:rgba(20,12,6,.5);z-index:40;opacity:0;pointer-events:none;transition:.25s}
 .ov.on{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:720px;transform:translate(-50%,105%);background:#fff;border-radius:26px 26px 0 0;z-index:41;transition:transform .35s cubic-bezier(.2,.9,.25,1);max-height:90vh;overflow:auto;padding-bottom:env(safe-area-inset-bottom)}
+.sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:720px;transform:translate(-50%,105%);background:#fff;border-radius:26px 26px 0 0;z-index:41;transition:transform .35s cubic-bezier(.2,.9,.25,1);max-height:90vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:env(safe-area-inset-bottom)}
 .sheet.on{transform:translate(-50%,0)}
 .sheet .grab{width:44px;height:5px;border-radius:9px;background:#ddd;margin:10px auto}
 .sheet .big{aspect-ratio:4/3;margin:0 16px;border-radius:20px;overflow:hidden;display:grid;place-items:center;font-size:90px;position:relative}
@@ -138,7 +140,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 0 30px}
 .sheet .opt{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid var(--line);border-radius:14px;font-family:'Prompt'}
 .sheet .opt b{font-size:20px;color:var(--pri)}
 .sheet .hint{margin-top:14px;font-size:14px;color:var(--muted);text-align:center}
-.sheet .x{position:absolute;right:14px;top:10px;border:0;background:#F3ECE4;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer}
+.sheet .x{position:absolute;right:12px;top:8px;z-index:5;border:0;background:rgba(255,255,255,.92);box-shadow:0 2px 8px rgba(0,0,0,.18);width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer}
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:#2B1D14;color:#fff;padding:9px 16px;border-radius:12px;z-index:60;transition:.25s;font-size:14px}
 .toast.on{transform:translate(-50%,0)}
 .load{display:grid;place-items:center;min-height:60vh;color:var(--muted)}
@@ -265,8 +267,24 @@ function boot() {
     if (!window.BP_API && publicBase(d.config) && !/noredir/.test(location.search)) { goPublic(publicBase(d.config) + 'menu.html'); return; }
     const s2 = sig(d); D = d;
     try { localStorage.setItem('bp_menu', JSON.stringify(d)); } catch (e) {}
-    if (s2 !== lastSig) { lastSig = s2; const y = scrollY; render(); if (y) scrollTo(0, y); }
+    if (s2 !== lastSig) { lastSig = s2; whenIdle(rerenderKeep); }
   }, e => { if (!D) $('#app').innerHTML = `<div class="load">โหลดเมนูไม่สำเร็จ ลองใหม่อีกครั้ง<br><small>${esc(e.message)}</small></div>`; });
+}
+/* iPhone: ห้ามสร้างหน้าใหม่หรือสั่งเลื่อนระหว่างที่ลูกค้ากำลังแตะ/เลื่อน — ไม่งั้นการแตะหายและเลื่อนค้าง */
+let lastAct = 0, touching = false;
+addEventListener('touchstart', () => { touching = true; lastAct = Date.now(); }, { passive:true });
+addEventListener('touchend', () => { touching = false; lastAct = Date.now(); }, { passive:true });
+addEventListener('scroll', () => { lastAct = Date.now(); }, { passive:true });
+function whenIdle(fn) {
+  const ok = () => !touching && Date.now() - lastAct > 1200 && !($('#sheet') && $('#sheet').classList.contains('on'));
+  if (ok()) fn(); else setTimeout(() => whenIdle(fn), 700);
+}
+function rerenderKeep() {
+  const bh = barHt || 0, secs = [...document.querySelectorAll('main .sec')];
+  const a = secs.find(x => x.getBoundingClientRect().bottom > bh + 4), id = a && a.id, off = a ? a.getBoundingClientRect().top : 0, y = scrollY;
+  render();
+  const b = id && document.getElementById(id);
+  if (b) window.scrollTo(0, b.getBoundingClientRect().top + scrollY - off); else if (y) window.scrollTo(0, y);
 }
 const cat = n => D.categories.find(c => c.name === n) || { emoji:'☕', color:'#6B4226' };
 const nm = m => m.displayName || m.name;
@@ -373,14 +391,21 @@ function listHtml(q) {
 function bind() {
   const qi = $('#q');
   qi.addEventListener('input', () => { $('#list').innerHTML = listHtml(qi.value); reveal(); spy.cur = null; spy(); });
-  document.querySelectorAll('[data-go]').forEach(a => a.onclick = () => { const t = document.getElementById(a.dataset.go); if (t) scrollTo({ top: t.getBoundingClientRect().top + scrollY - barH() + 2, behavior:'smooth' }); });
+  document.querySelectorAll('[data-go]').forEach(a => a.onclick = e => {
+    e.preventDefault();
+    const t = document.getElementById(a.dataset.go); if (!t) return;
+    /* เลื่อนแบบทันที (smooth บน iPhone มักค้างกลางทางเมื่อมีการเลื่อนอื่นซ้อน) */
+    spy.lock = Date.now() + 700;
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === a)); spy.cur = a.dataset.go;
+    window.scrollTo(0, Math.max(0, t.getBoundingClientRect().top + scrollY - barH() + 2));
+  });
   const cpw = $('#cpw'); if (cpw) cpw.onclick = () => { navigator.clipboard.writeText(D.config.wifiPass).then(() => toast('คัดลอกรหัส Wi-Fi แล้ว')); };
   barHt = 0; spy.cur = null;
   if (!window.__spy) { addEventListener('scroll', spy, { passive:true }); window.__spy = 1; } spy();
 }
 document.addEventListener('click', e => {
   const it = e.target.closest('[data-item]'); if (it) openItem(it.dataset.item);
-  if (e.target.id === 'ov' || e.target.closest('.x')) closeItem();
+  if (e.target.id === 'ov' || e.target.closest('.x') || e.target.closest('.grab')) closeItem();
 });
 function openItem(name) {
   const m = D.menu.find(x => x.name === name); if (!m) return;
@@ -413,12 +438,21 @@ function spyRun() {
   const line = barHt + 24; let cur = '';
   const secs = document.querySelectorAll('main .sec');
   for (let k = 0; k < secs.length; k++) { if (secs[k].getBoundingClientRect().top <= line) cur = secs[k].id; else break; }
+  if (spy.lock && Date.now() < spy.lock) { centerChipLater(); return; }
   if (cur === spy.cur) return; spy.cur = cur;
-  const box = bar.querySelector('.chips');
-  document.querySelectorAll('.chip').forEach(c => {
-    const on = c.dataset.go === cur; c.classList.toggle('on', on);
-    if (on && box) box.scrollTo({ left: c.offsetLeft - (box.clientWidth - c.offsetWidth) / 2, behavior:'smooth' });
-  });
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.go === cur));
+  centerChipLater();
+}
+/* เลื่อนแถบหมวดให้หมวดปัจจุบันอยู่กลาง "หลังจากหยุดเลื่อนแล้ว" เท่านั้น (เลื่อนซ้อนระหว่างปัดบน iPhone ทำให้หน้าค้าง) */
+let ccT;
+function centerChipLater() {
+  clearTimeout(ccT);
+  ccT = setTimeout(() => {
+    if (touching || Date.now() - lastAct < 250) return centerChipLater();
+    const box = document.querySelector('#bar .chips'), c = box && box.querySelector('.chip.on'); if (!c) return;
+    const x = Math.max(0, c.offsetLeft - (box.clientWidth - c.offsetWidth) / 2);
+    if (Math.abs(box.scrollLeft - x) > 4) box.scrollLeft = x;
+  }, 300);
 }
 addEventListener('resize', () => { barH(); spy.cur = null; spy(); }, { passive:true });
 let tt; function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('on'), 2000); }
