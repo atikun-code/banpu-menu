@@ -261,10 +261,37 @@ let D = null;
 
 let lastSig = '';
 const sig = d => JSON.stringify([d.config, d.menu, d.categories, d.top, d.promos]);
+/* ---------- สถิติการเข้าชม (ไม่เก็บข้อมูลส่วนตัว: ใช้รหัสสุ่มในเครื่องลูกค้าเพื่อนับจำนวนคน) ---------- */
+const TR = (() => {
+  let vid = '', isNew = false;
+  try { vid = localStorage.getItem('bp_vid') || ''; if (!vid) { vid = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); localStorage.setItem('bp_vid', vid); isNew = true; } } catch (e) { vid = 'x' + Math.random().toString(36).slice(2, 9); }
+  const ua = navigator.userAgent + ' ' + document.referrer;
+  const src = /[?&]src=qr/.test(location.search) ? 'qr' : /FBAN|FBAV|FB_IAB|facebook/i.test(ua) ? 'facebook' : /Line\/|line\.me/i.test(ua) ? 'line'
+    : /Instagram/i.test(ua) ? 'instagram' : /google\./i.test(document.referrer) ? 'google' : document.referrer && document.referrer.indexOf(location.host) < 0 ? 'web' : 'direct';
+  const last = {};
+  function send(t, k, extra) {
+    if (/[?&]notrack/.test(location.search)) return;
+    const id = t + '|' + (k || ''); if (last[id] && Date.now() - last[id] < 20000) return; last[id] = Date.now();
+    const p = Object.assign({ t, k: k || '', v: vid, s: src }, extra || {});
+    try {
+      if (window.BP_API) {
+        const q = Object.keys(p).map(x => x + '=' + encodeURIComponent(p[x])).join('&');
+        fetch(window.BP_API + (window.BP_API.indexOf('?') > -1 ? '&' : '?') + 'api=hit&' + q, { mode:'no-cors', keepalive:true, cache:'no-store' }).catch(() => {});
+      } else if (window.google && google.script && google.script.run) google.script.run.withFailureHandler(() => {}).hit(p);
+    } catch (e) {}
+  }
+  return {
+    view() { const k = 'bp_seen_' + ymd(); try { if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k, 1); } catch (e) {} send('view', '', { n: isNew ? 1 : 0 }); },
+    item: n => send('item', n), cat: n => send('cat', n),
+    search: (q, found) => send('search', q, { s: found ? 'hit' : 'miss' })
+  };
+})();
+let srchT;
 function boot() {
   if (!D) try { const c = localStorage.getItem('bp_menu'); if (c) { D = JSON.parse(c); lastSig = sig(D); render(); } } catch (e) {}
   fetchDisplay(d => {
-    if (!window.BP_API && publicBase(d.config) && !/noredir/.test(location.search)) { goPublic(publicBase(d.config) + 'menu.html'); return; }
+    if (!window.BP_API && publicBase(d.config) && !/noredir/.test(location.search)) { goPublic(publicBase(d.config) + 'menu.html' + (/src=qr/.test(location.search) ? '?src=qr' : '')); return; }
+    TR.view();
     const s2 = sig(d); D = d;
     try { localStorage.setItem('bp_menu', JSON.stringify(d)); } catch (e) {}
     if (s2 !== lastSig) { lastSig = s2; whenIdle(rerenderKeep); }
@@ -390,12 +417,16 @@ function listHtml(q) {
 }
 function bind() {
   const qi = $('#q');
-  qi.addEventListener('input', () => { $('#list').innerHTML = listHtml(qi.value); reveal(); spy.cur = null; spy(); });
+  qi.addEventListener('input', () => {
+    $('#list').innerHTML = listHtml(qi.value); reveal(); spy.cur = null; spy();
+    clearTimeout(srchT); const q = qi.value.trim();
+    if (q.length >= 2) srchT = setTimeout(() => TR.search(q, !!document.querySelector('#list .item')), 1500);
+  });
   document.querySelectorAll('[data-go]').forEach(a => a.onclick = e => {
     e.preventDefault();
     const t = document.getElementById(a.dataset.go); if (!t) return;
     /* เลื่อนแบบทันที (smooth บน iPhone มักค้างกลางทางเมื่อมีการเลื่อนอื่นซ้อน) */
-    spy.lock = Date.now() + 700;
+    spy.lock = Date.now() + 700; TR.cat(a.textContent.trim());
     document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === a)); spy.cur = a.dataset.go;
     window.scrollTo(0, Math.max(0, t.getBoundingClientRect().top + scrollY - barH() + 2));
   });
@@ -409,6 +440,7 @@ document.addEventListener('click', e => {
 });
 function openItem(name) {
   const m = D.menu.find(x => x.name === name); if (!m) return;
+  TR.item(m.name);
   const r = rank(m.name), ps = prices(m);
   $('#sheet').innerHTML = `<div class="grab"></div><button class="x">✕</button>${imgBox(m, 'big')}
     <div class="c"><h3>${esc(nm(m))}</h3>

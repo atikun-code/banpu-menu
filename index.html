@@ -425,7 +425,7 @@ const H = 'https:' + '/' + '/';
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num = v => { const n = Number(v); return isFinite(n) ? n : 0; };
 const thMonth = m => { if (!m) return ''; const [y, mm] = String(m).split('-').map(Number); return `${TH_M[mm - 1]} ${y + 543}`; };
-const menuUrl = () => menuLink(D);
+const menuUrl = () => { const u = menuLink(D); return u + (u.indexOf('?') > -1 ? '&' : '?') + 'src=qr'; };
 const qrSrc = (txt, size) => H + 'api.qrserver.com/v1/create-qr-code/?margin=0&size=' + (size || 300) + 'x' + (size || 300) + '&data=' + encodeURIComponent(txt);
 let D = null, slides = [], idx = 0, timer = null, orient = '';
 
