@@ -72,6 +72,10 @@ body.role-board .dots,body.role-board .prog{display:none}
 body.role-focus header{padding-top:calc(1.4*var(--u));padding-bottom:calc(.8*var(--u))}
 body.role-focus .logo{width:calc(7*var(--u));height:calc(7*var(--u))}
 body.role-focus .dots,body.role-focus .prog{display:none}
+/* จอป้ายนิ่ง: หน้าที่ไม่ได้แสดงให้หายไปเลย (กันภาพซ้อนจาง ๆ บนเครื่องที่การ์ดจอเก่า) */
+body.role-focus .slide:not(.on),body.role-board .slide:not(.on){display:none}
+body.role-focus .slide.on,body.role-board .slide.on{transition:none;animation:pgIn .6s ease both}
+@keyframes pgIn{from{opacity:0}to{opacity:1}}
 /* ---------- ป้ายเมนูนิ่ง + กรอบไฮไลต์ + ภาพเมนูด้านล่าง (screen=focus) ---------- */
 .fb{flex:1;min-height:0;display:flex;flex-direction:column;gap:calc(1.6*var(--u))}
 .fb.fl{flex-direction:row}
@@ -82,8 +86,8 @@ body.role-focus .dots,body.role-focus .prog{display:none}
 .bd-mc .bd-cat{display:block;margin-bottom:calc(var(--bs)*1.4*var(--u));-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .bd-mc .bd-r{break-inside:avoid}.bd-mc .bd-h{break-after:avoid;break-inside:avoid}
 .fb.fl .board{flex:1.25 1 0}
-.fb-pan{flex:0 0 40%;min-height:0;position:relative;border-radius:calc(2.6*var(--u));overflow:hidden;background:#120A05;box-shadow:0 calc(1*var(--u)) calc(4*var(--u)) rgba(0,0,0,.5),0 0 0 calc(.35*var(--u)) var(--acc)}
-.fb.fl .fb-pan{flex:0 0 40%}
+.fb-pan{flex:0 0 var(--fph,40%);min-height:0;position:relative;border-radius:calc(2.6*var(--u));overflow:hidden;background:#120A05;box-shadow:0 calc(1*var(--u)) calc(4*var(--u)) rgba(0,0,0,.5),0 0 0 calc(.35*var(--u)) var(--acc)}
+.fb.fl .fb-pan{flex:0 0 var(--fph,40%)}
 .fp-in{position:absolute;inset:0;animation:fpIn .9s cubic-bezier(.2,.8,.2,1) both}
 .fp-in.out{animation:fpOut .7s ease both}
 .fp-img{position:absolute;inset:0;overflow:hidden}
@@ -106,6 +110,31 @@ body.role-focus .dots,body.role-focus .prog{display:none}
 @keyframes frPulse{50%{box-shadow:0 0 0 calc(.6*var(--u)) rgba(232,163,61,.15),0 0 calc(5*var(--u)) rgba(232,163,61,.85),inset 0 0 calc(2*var(--u)) rgba(232,163,61,.3)}}
 @keyframes frPoint{50%{transform:translate(calc(.6*var(--u)),-50%)}}
 @keyframes fpIn{from{opacity:0;transform:translateX(8%) scale(1.03)}to{opacity:1;transform:none}}
+/* --- รูปแบบการแสดงภาพ (admin เลือก) --- */
+.fb.lay-below .fp-in{display:grid;grid-template-rows:minmax(0,1fr) auto}
+.fb.lay-below .fp-img,.fb.lay-side .fp-img{position:relative;inset:auto}
+.fb.lay-below .fp-txt,.fb.lay-side .fp-txt{position:relative;background:linear-gradient(180deg,#2A1A10,#1A100A);padding:calc(1.4*var(--u)) calc(2.4*var(--u)) calc(1.6*var(--u));border-top:calc(.3*var(--u)) solid var(--acc)}
+.fb.lay-below .fp-n,.fb.lay-side .fp-n{text-shadow:none;font-size:calc(var(--fs)*4.4*var(--u))}
+.fb.lay-side .fp-in{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+.fb.lay-side .fp-tag{align-self:flex-start}.fb.lay-side .fp-ps{flex-direction:column;align-items:flex-start}
+.fb.lay-side .fp-txt{border-top:0;border-left:calc(.3*var(--u)) solid var(--acc);display:flex;flex-direction:column;justify-content:center}
+.fb.lay-overlay .fp-txt{background:linear-gradient(transparent,rgba(10,5,2,.55) 40%,rgba(10,5,2,.8))}
+.fb.lay-photo .fp-txt{display:none}
+.fb.fit-cover .fp-img img.pbg{display:none}.fb.fit-cover .fp-img img.pfg{object-fit:cover!important;padding:0}
+.fb.kb-off .fp-img img.pfg{animation:none}
+.fb.an-fade .fp-in{animation:fFade .9s ease both}.fb.an-fade .fp-in.out{animation:fFadeO .7s ease both}
+.fb.an-zoom .fp-in{animation:fZoom .9s cubic-bezier(.2,.8,.2,1) both}.fb.an-zoom .fp-in.out{animation:fFadeO .6s ease both}
+.fb.an-up .fp-in{animation:fUp .9s cubic-bezier(.2,.8,.2,1) both}.fb.an-up .fp-in.out{animation:fUpO .7s ease both}
+.fb.an-flip .fp-in{animation:fFlip .9s ease both;backface-visibility:hidden}.fb.an-flip .fp-in.out{animation:fFadeO .4s ease both}
+.fb.an-none .fp-in,.fb.an-none .fp-in.out{animation:none}.fb.an-none .fp-in.out{display:none}
+@keyframes fFade{from{opacity:0}to{opacity:1}}@keyframes fFadeO{to{opacity:0}}
+@keyframes fZoom{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+@keyframes fUp{from{opacity:0;transform:translateY(12%)}to{opacity:1;transform:none}}@keyframes fUpO{to{opacity:0;transform:translateY(-8%)}}
+@keyframes fFlip{from{opacity:0;transform:perspective(1200px) rotateY(70deg)}to{opacity:1;transform:none}}
+/* --- กรอบไฮไลต์ --- */
+.fb-frame.fr-solid{background:var(--acc);box-shadow:none;animation:none!important;opacity:.0}.fb-frame.fr-solid.on{opacity:.22}
+.fb-frame.fr-line{border:0;border-bottom:calc(.5*var(--u)) solid var(--acc);border-radius:0;background:none;box-shadow:0 calc(.6*var(--u)) calc(1.4*var(--u)) calc(-.6*var(--u)) rgba(232,163,61,.7);animation:none!important}
+.fb-frame.fr-line::after,.fb-frame.fr-solid::after{display:none}
 @keyframes fpOut{to{opacity:0;transform:translateX(-6%) scale(.98)}}
 @keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.12)}}
 /* ---------- จอโปรโมต: เพิ่มความอร่อย / QR ---------- */
@@ -535,7 +564,7 @@ function promoNow(p, now) {
 </script>
 
 <script>
-const P = Object.fromEntries(new URLSearchParams(location.search)); P.view = P.view || 'display';
+const P = Object.fromEntries([...new URLSearchParams(location.search)].map(([k, v]) => [k.trim(), v.trim()])); P.view = P.view || 'display';
 const TH_M = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 const H = 'https:' + '/' + '/';
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -670,7 +699,8 @@ function build() {
   CLOSE = P.view === 'print' ? null : closureNow(D.closures);
   B.closed = CLOSE && !P.cat ? [{ html: closedHtml(CLOSE), sec: 10, cls:'closedslide' }] : [];
   B.board = P.cat ? [] : boardPages(cats, land);
-  B.focus = P.cat ? [] : boardPages(cats, land, { focus:true, noAdd:true, perCol: land ? 17 : 22, ncol: 2 });
+  const FC = fcfg(), fcats = FC.cats && FC.cats.length ? cats.filter(k => FC.cats.indexOf(k.name) > -1) : cats;
+  B.focus = P.cat ? [] : boardPages(fcats.length ? fcats : cats, land, { focus:true, noAdd:true, perCol: FPER || (land ? 17 : 22), ncol: 2 });
   B.new = P.cat ? [] : D.menu.filter(m => /ใหม่|new/i.test(m.badge || '') && !m.soldOut).slice(0, 4).map(m => ({ html: spotHtml(m, null, land, '✨ เมนูใหม่ ลองเลย!'), sec: spotSec + 2, cls:'spotslide' }));
   B.upsell = P.cat ? [] : upsellHtml(land);
   B.qrs = P.cat || !D.appUrl ? [] : [{ html: qrSlideHtml(land), sec: 10, cls:'qrslide' }];
@@ -726,6 +756,9 @@ function build() {
   tick();
   fitName();
   fitBoards();
+  /* ป้ายนิ่ง: ถ้าหน้าไหนต้องย่อตัวหนังสือจนเล็กเกินไป → แบ่งหน้าใหม่ให้แต่ละหน้ามีเมนูน้อยลง */
+  const fbs = [...document.querySelectorAll('.focusslide .board')].map(b => parseFloat(b.style.getPropertyValue('--bs')) || 1);
+  if (fbs.length && Math.min(...fbs) < .74 && (FPER || 22) > 8) { FPER = (FPER || (isLand() ? 17 : 22)) - 1; return build(); }
   if (document.querySelector('.focusslide')) { FOC.el = null; setTimeout(() => focusStep(true), 500); focusLoop(); }
   startRail();
   if (!lite) startFx();
@@ -830,7 +863,10 @@ function startRail() {
   }, hold);
 }
 /* ---------- ป้ายราคา (จอจุดสั่ง): ทุกหมวดในหน้าเดียวแบบป้ายเมนูเดิม อ่านง่าย ไม่มีรูป ---------- */
-let PEAK = false;
+/* ตั้งค่าป้ายนิ่ง (admin ปรับได้) */
+const FC_DEF = { layout:'below', fit:'contain', anim:'slide', ken:'Y', panel:40, sec:5, order:'menu', onlyImg:'Y', frame:'glow', cats:[], showDesc:'Y', showTag:'Y' };
+function fcfg() { let o = {}; try { o = JSON.parse((D && D.config && D.config.focusCfg) || '{}') || {}; } catch (e) { o = {}; } return Object.assign({}, FC_DEF, o); }
+let PEAK = false, FPER = 0;   /* FPER = แถวต่อคอลัมน์ของป้ายนิ่ง (ปรับลดอัตโนมัติถ้าตัวหนังสือเล็กเกิน) */
 function boardBlock(k, items, part) {
   items = items || sortedMenu(k.name); if (!items.length) return null;
   const hasV = items.some(m => num(m.priceHot) || num(m.priceIced) || num(m.priceBlend));
@@ -850,9 +886,11 @@ function boardPages(cats, land, opt) {
   const perCol = Math.round((opt.perCol || (land ? 13 : 22)) / Math.max(.7, FS)), cap = perCol * ncol;  /* แถวต่อคอลัมน์/หน้า โดยประมาณ */
   /* หมวดที่ยาวเกินคอลัมน์ → แบ่งเป็นหลายก้อน "(ต่อ)" */
   const blocks = [];
-  bc.forEach(k => { const its = sortedMenu(k.name), per = opt.focus ? 999 : Math.max(4, perCol - 2); for (let i = 0; i < its.length; i += per) blocks.push(boardBlock(k, its.slice(i, i + per), i > 0)); });
+  bc.forEach(k => { const its = sortedMenu(k.name), per = opt.focus ? (its.length > perCol * 2 - 2 ? perCol * 2 - 2 : 999) : Math.max(4, perCol - 2); for (let i = 0; i < its.length; i += per) blocks.push(boardBlock(k, its.slice(i, i + per), i > 0)); });
   const pages = []; let cur = [], rows = 0;
-  blocks.forEach(b => { if (cur.length && rows + b.n > cap) { pages.push(cur); cur = []; rows = 0; } cur.push(b); rows += b.n; });
+  /* เฉลี่ยเมนูให้แต่ละหน้าใกล้เคียงกัน (ไม่ให้หน้าแรกแน่น หน้าสุดท้ายโล่ง) */
+  const total = blocks.reduce((x, b) => x + b.n, 0), np = Math.max(1, Math.ceil(total / cap)), capE = Math.min(cap, Math.ceil(total / np * 1.08));
+  blocks.forEach(b => { if (cur.length && rows + b.n > capE && pages.length < np - 1) { pages.push(cur); cur = []; rows = 0; } cur.push(b); rows += b.n; });
   if (cur.length) pages.push(cur);
   const add = D.addons || [];
   const addHtml = add.length && !opt.noAdd ? `<div class="bd-add"><b>➕ เพิ่มความอร่อย</b>${add.map(a => `<span>${esc(a.name)} <em>+${num(a.price)}</em></span>`).join('')}</div>` : '';
@@ -871,22 +909,30 @@ function boardPages(cats, land, opt) {
 }
 /* ---------- ป้ายเมนูนิ่ง + กรอบไฮไลต์ ---------- */
 function focusPage(colsArr, i, n, land) {
-  return { html: `<div class="fb ${land ? 'fl' : ''}"><div class="board" data-fit="1" data-focus="1"><div class="bd-mc" style="--cols:${colsArr.length > 1 ? 2 : 1}">${colsArr.map(c => c.b.join('')).join('')}</div>${n > 1 ? `<span class="pg bd-pg">${i + 1}/${n}</span>` : ''}<div class="fb-frame"></div></div><div class="fb-pan"></div></div>`,
+  const F = fcfg();
+  return { html: `<div class="fb ${land ? 'fl' : ''} lay-${F.layout} fit-${F.fit} an-${F.anim} ${F.ken === 'N' ? 'kb-off' : ''}" style="--fph:${Math.max(25, Math.min(60, num(F.panel) || 40))}%"><div class="board" data-fit="1" data-focus="1"><div class="bd-mc" style="--cols:${colsArr.length > 1 ? 2 : 1}">${colsArr.map(c => c.b.join('')).join('')}</div>${n > 1 ? `<span class="pg bd-pg">${i + 1}/${n}</span>` : ''}<div class="fb-frame fr-${F.frame}"></div></div><div class="fb-pan"></div></div>`,
     sec: 0, cls:'focusslide', focus:true };
 }
 /** ลำดับเมนูที่จะไฮไลต์ในหน้านั้น (ข้ามเมนูหมด • ถ้ามีรูป ใช้เฉพาะเมนูที่มีรูป) */
 function focusRows(sl) {
-  const rows = [...sl.querySelectorAll('.bd-r[data-fi]')].filter(r => !r.classList.contains('so'));
+  const F = fcfg();
+  if (sl._rows && sl._rowsKey === F.order + F.onlyImg) return sl._rows;
+  let rows = [...sl.querySelectorAll('.bd-r[data-fi]')].filter(r => !r.classList.contains('so'));
   const withImg = rows.filter(r => { const m = D.menu.find(x => x.name === r.dataset.fi); return m && m.image; });
-  return withImg.length >= Math.min(3, rows.length) ? withImg : rows;
+  if (F.onlyImg !== 'N' && withImg.length) rows = withImg;
+  if (F.order === 'top') rows = rows.slice().sort((a, b) => rankOf(a.dataset.fi) - rankOf(b.dataset.fi));
+  if (F.order === 'random') rows = rows.map(r => [Math.random(), r]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+  sl._rows = rows; sl._rowsKey = F.order + F.onlyImg;
+  return rows;
 }
 const FOC = { el:null, i:-1, t:0 };
 function focusPanel(m) {
   const k = catInfo(m.category), r = rankOf(m.name), ps = D.config.showPrices === 'N' ? [] : prices(m);
   const lab = { 'ร้อน':'🔥 ร้อน', 'เย็น':'🧊 เย็น', 'ปั่น':'🌀 ปั่น', '':'ราคา' };
   const tag = /ใหม่|new/i.test(m.badge || '') ? '✨ เมนูใหม่' : r < 3 ? `${MEDAL[r]} ขายดีอันดับ ${r + 1}` : r < 10 ? '🔥 ขายดี' : `${k.emoji || '☕'} ${m.category}`;
+  const F = fcfg();
   return `<div class="fp-in"><div class="fp-img" style="background:radial-gradient(circle at 50% 40%,${esc(k.color)}66,#120A05)">${m.image ? pic(m.image) : `<span class="emo">${esc(k.emoji || '☕')}</span>`}</div>
-    <div class="fp-txt"><div class="fp-tag">${esc(tag)}</div><div class="fp-n">${esc(menuName(m))}</div>${m.desc ? `<div class="fp-d">${esc(m.desc)}</div>` : ''}
+    <div class="fp-txt">${F.showTag !== 'N' ? `<div class="fp-tag">${esc(tag)}</div>` : ''}<div class="fp-n">${esc(menuName(m))}</div>${m.desc && F.showDesc !== 'N' ? `<div class="fp-d">${esc(m.desc)}</div>` : ''}
     <div class="fp-ps">${ps.map(p => `<div class="fp-p"><span>${lab[p[0]] || esc(p[0])}</span><b>${num(p[1])}</b></div>`).join('')}</div></div></div>`;
 }
 /** ตำแหน่งแถวเทียบกับกล่องป้าย (ใช้ offset ไม่ใช้ getBoundingClientRect → ถูกต้องแม้หมุนจอ rot=90/270) */
@@ -912,7 +958,7 @@ function focusStep(force) {
 }
 function focusLoop() {
   clearTimeout(FOC.t);
-  const sec = Math.max(3, num(P.spot) || num(D && D.config && D.config.spotSeconds) || 5);
+  const sec = Math.max(2, num(P.spot) || num(fcfg().sec) || num(D && D.config && D.config.spotSeconds) || 5);
   FOC.t = setTimeout(() => {
     if (FOC.next) { FOC.next = false; const ss = document.querySelectorAll('.slide'); idx = (idx + 1) % ss.length; show(idx); setTimeout(() => focusStep(true), 900); }
     else focusStep();
@@ -922,13 +968,30 @@ function focusLoop() {
 /** ปรับขนาดตัวอักษรป้ายราคาให้เต็มพื้นที่พอดี (ไม่ล้น ไม่โหรง) */
 function fitBoards() {
   document.querySelectorAll('.board[data-fit]').forEach(b => {
-    const sl = b.closest('.slide'), vis = sl.style.visibility; sl.style.visibility = 'visible';
-    let lo = .55, hi = 1.6;
-    for (let k = 0; k < 9; k++) { const m = (lo + hi) / 2; b.style.setProperty('--bs', m); (b.scrollHeight > b.clientHeight + 2 || b.scrollWidth > b.clientWidth + 2) ? hi = m : lo = m; }
-    b.style.setProperty('--bs', lo); sl.style.visibility = vis;
+    const sl = b.closest('.slide'), vis = sl.style.visibility, dis = sl.style.display;
+    sl.style.visibility = 'visible'; sl.style.display = 'flex';
+    let lo = .5, hi = 1.6;
+    /* เผื่อขอบ 1.5% กันตัวหนังสือล้น/ถูกตัด (ฟอนต์จริงบนจออาจกว้างกว่าตอนวัด) */
+    const fr = b.querySelector('.fb-frame'), bm = b.querySelector('.bd-mc') || b; if (fr) fr.style.display = 'none';
+    /* ล้นจอ หรือ ชื่อเมนูถูกตัด "…" เกินไม่กี่รายการ → ย่อลง */
+    const names = [...b.querySelectorAll('.bd-n')], allow = Math.max(1, Math.round(names.length * .06));
+    const cut = () => { let n = 0; for (const x of names) if (x.scrollWidth > x.clientWidth + 1 && ++n > allow) return true; return false; };
+    const over = () => b.scrollHeight > b.clientHeight + 1 || bm.scrollWidth > bm.clientWidth + 1 || cut();
+    for (let k = 0; k < 10; k++) { const m = (lo + hi) / 2; b.style.setProperty('--bs', m * 1.03); over() ? hi = m : lo = m; }
+    b.style.setProperty('--bs', lo); sl.style.visibility = vis; sl.style.display = dis; if (fr) fr.style.display = '';
   });
+  focusReframe();
+}
+/** ย้ายกรอบให้ตรงแถวเดิมหลังขนาดตัวอักษรเปลี่ยน */
+function focusReframe() {
+  const sl = document.querySelector('.slide.on.focusslide'), row = sl && sl.querySelector('.bd-r.fon'); if (!row) return;
+  const box = sl.querySelector('.board'), fr = sl.querySelector('.fb-frame'), o = offIn(row, box), pad = Math.min(innerWidth, innerHeight) * .006;
+  Object.assign(fr.style, { left: (o.x - pad * 1.6) + 'px', top: (o.y - pad) + 'px', width: (o.w + pad * 3.2) + 'px', height: (o.h + pad * 2) + 'px' });
 }
 addEventListener('resize', () => { clearTimeout(fitBoards.t); fitBoards.t = setTimeout(fitBoards, 250); });
+/* ฟอนต์โหลดเสร็จทีหลัง → ตัวหนังสือกว้างขึ้น ต้องคำนวณขนาดใหม่ (สาเหตุที่แถวท้ายคอลัมน์ถูกตัด) */
+if (document.fonts) { document.fonts.ready.then(() => fitBoards()); document.fonts.addEventListener && document.fonts.addEventListener('loadingdone', () => { clearTimeout(fitBoards.f); fitBoards.f = setTimeout(fitBoards, 200); }); }
+setInterval(() => { if (document.querySelector('.board[data-fit]')) fitBoards(); }, 60000);
 /* ---------- จอโปรโมต: เพิ่มความอร่อย (ท็อปปิ้ง + ขนม) ---------- */
 function upsellHtml(land) {
   const add = (D.addons || []).slice(0, land ? 8 : 6);
@@ -999,6 +1062,7 @@ function show(i) {
   clearTimeout(timer);
   const isF = ss[i] && ss[i].classList.contains('focusslide');
   if (ss.length > 1 && !isF) timer = setTimeout(() => { idx = (i + 1) % ss.length; show(idx); }, sec * 1000);
+  if (isF || (ss[i] && ss[i].querySelector('.board[data-fit]'))) fitBoards();
   if (isF) setTimeout(() => focusStep(true), 400);
 }
 function tick() {
