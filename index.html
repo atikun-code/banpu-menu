@@ -11,8 +11,124 @@
 <style>
 :root{--pri:#6B4226;--acc:#E8A33D;--bg:#1A100A;--card:#FFF8EF;--ink:#2B1D14;--u:1vmin;--fs:1;--fp:1}
 *{box-sizing:border-box;margin:0;padding:0}
+html.rot{overflow:hidden;width:100%;height:100%}
+html.rot body{position:fixed;top:0;left:0;width:100vh;height:100vw;transform-origin:0 0}
+html.rot270 body{transform:translateY(100vh) rotate(-90deg)}
+html.rot90 body{transform:translateX(100vw) rotate(90deg)}
 html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Prompt','Sarabun',sans-serif;color:#FFF3E3}
 body.hidecur{cursor:none}
+/* ---------- แถบเมนูทั้งหมด (rail) ---------- */
+body.has-rail #stage{grid-template-rows:auto auto minmax(0,1fr) auto auto}
+body.has-rail #stage>.rail{grid-row:4}body.has-rail #stage>footer{grid-row:5}
+.rail{height:calc(50*var(--u));margin:calc(.6*var(--u)) calc(3.6*var(--u)) 0;display:flex;flex-direction:column;min-height:0;border-top:calc(.3*var(--u)) solid var(--acc);padding-top:calc(.8*var(--u))}
+.rl-head{display:flex;align-items:center;gap:calc(1.4*var(--u));font-size:calc(var(--fs)*2.3*var(--u));margin-bottom:calc(1*var(--u))}
+.rl-head span:first-child{opacity:.8}
+.rl-head b{background:var(--acc);color:#2B1D14;border-radius:99px;padding:calc(.2*var(--u)) calc(1.6*var(--u));font-size:calc(var(--fs)*2.5*var(--u))}
+.rl-head .rl-qr{margin-left:auto;font-size:calc(var(--fs)*1.7*var(--u));opacity:.6}
+.rl-view{flex:1;min-height:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.rl-track{display:flex;gap:calc(1.6*var(--u));height:100%;will-change:transform}
+.rl-it,.rl-cat{flex:0 0 calc(29*var(--u));height:100%;border-radius:calc(2*var(--u));overflow:hidden;display:flex;flex-direction:column}
+.rl-it{background:var(--card);color:var(--ink)}
+.rl-it .img{position:relative;flex:1;min-height:0;display:grid;place-items:center;overflow:hidden}
+.rl-it .img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rl-it .emo{font-size:calc(11*var(--u))}
+.rl-it .n{font-weight:700;font-size:calc(var(--fs)*2.5*var(--u));padding:calc(.7*var(--u)) calc(1.2*var(--u)) 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rl-it .ps{display:flex;gap:calc(.8*var(--u));padding:calc(.3*var(--u)) calc(1.2*var(--u)) calc(1*var(--u));flex-wrap:wrap}
+.rl-it .ps span{display:flex;align-items:baseline;gap:calc(.3*var(--u))}
+.rl-it .ps i{font-style:normal;font-size:calc(var(--fs)*1.6*var(--u));color:#8A7A6D}
+.rl-it .ps b{font-size:calc(var(--fs)*var(--fp)*3*var(--u));color:var(--pri);font-weight:800}
+.rl-it.so{opacity:.55}.rl-it.so .ps b{text-decoration:line-through}
+.rl-b{position:absolute;left:calc(1*var(--u));top:calc(1*var(--u));background:var(--acc);color:#2B1D14;font-weight:700;border-radius:99px;padding:calc(.2*var(--u)) calc(1*var(--u));font-size:calc(var(--fs)*1.7*var(--u))}
+.rl-b.nw{background:#7BD389}.rl-b.sx{background:#8A3B32;color:#fff}
+.rl-cat{justify-content:center;align-items:center;text-align:center;gap:calc(.6*var(--u));background:linear-gradient(160deg,var(--cc),rgba(0,0,0,.35));color:#fff;flex-basis:calc(20*var(--u))}
+.rl-cat .e{font-size:calc(9*var(--u))}.rl-cat b{font-size:calc(var(--fs)*3.2*var(--u));line-height:1.15;padding:0 calc(1*var(--u))}.rl-cat small{opacity:.8;font-size:calc(var(--fs)*1.8*var(--u))}
+body.lite .rl-track{will-change:auto}
+/* ---------- ป้ายราคา (screen=board) ---------- */
+.board{--bs:1;flex:1;min-height:0;display:flex;flex-direction:column;gap:calc(var(--bs)*1.2*var(--u));overflow:hidden;padding-top:calc(.6*var(--u))}
+.bd-cols{flex:1;min-height:0;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:calc(var(--bs)*2.2*var(--u));align-items:start}
+.bd-col{display:flex;flex-direction:column;gap:calc(var(--bs)*1.6*var(--u))}
+.bd-cat{background:rgba(255,248,239,.06);border:1px solid rgba(255,243,227,.14);border-radius:calc(1.6*var(--u));padding:calc(var(--bs)*1*var(--u)) calc(var(--bs)*1.3*var(--u))}
+.bd-h,.bd-r{display:grid;grid-template-columns:minmax(0,1fr) repeat(var(--nc),calc(var(--bs)*var(--fs)*var(--fp)*5.2*var(--u)));align-items:center;column-gap:calc(var(--bs)*.4*var(--u))}
+.bd-h{border-bottom:calc(.3*var(--u)) solid var(--acc);padding-bottom:calc(var(--bs)*.5*var(--u));margin-bottom:calc(var(--bs)*.3*var(--u))}
+.bd-h .bd-hn{font-weight:800;color:var(--acc);font-size:calc(var(--bs)*var(--fs)*3*var(--u));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center}
+.bd-h .bd-e{display:none}
+.bd-c{text-align:center;font-size:calc(var(--bs)*var(--fs)*1.7*var(--u));opacity:.75}
+.bd-r{padding:calc(var(--bs)*.42*var(--u)) 0;border-bottom:1px dashed rgba(255,243,227,.12)}
+.bd-r:last-child{border-bottom:0}
+.bd-n{font-size:calc(var(--bs)*var(--fs)*2.45*var(--u));font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:calc(.6*var(--u))}
+.bd-p{text-align:center;font-size:calc(var(--bs)*var(--fs)*var(--fp)*2.7*var(--u));font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums}
+.bd-p.fo{color:#fff;text-shadow:0 0 calc(1*var(--u)) var(--acc)}
+.bd-t{font-style:normal;font-size:calc(var(--bs)*var(--fs)*1.35*var(--u));background:var(--acc);color:#2B1D14;border-radius:99px;padding:0 calc(.8*var(--u));font-weight:700;flex-shrink:0}
+.bd-t.nw{background:#7BD389}.bd-t.sx{background:#8A3B32;color:#fff}
+.bd-r.bd-hot .bd-n{font-weight:700}
+.bd-r.so .bd-n,.bd-r.so .bd-p{opacity:.4;text-decoration:line-through}
+.bd-add{display:flex;flex-wrap:wrap;gap:calc(var(--bs)*.6*var(--u)) calc(var(--bs)*1.6*var(--u));align-items:center;font-size:calc(var(--bs)*var(--fs)*2*var(--u));background:rgba(232,163,61,.12);border-radius:calc(1.4*var(--u));padding:calc(var(--bs)*.8*var(--u)) calc(var(--bs)*1.4*var(--u))}
+.bd-add b{color:var(--acc)}.bd-add em{font-style:normal;color:var(--acc);font-weight:700}
+.bd-pg{position:absolute;right:calc(3.6*var(--u));bottom:calc(.4*var(--u));font-size:calc(1.6*var(--u));opacity:.6}
+body.role-board header{padding-top:calc(1.4*var(--u));padding-bottom:calc(.8*var(--u))}
+body.role-board .logo{width:calc(7*var(--u));height:calc(7*var(--u))}
+body.role-board .shop{font-size:calc(var(--fs)*3.6*var(--u))}
+body.role-board .dots,body.role-board .prog{display:none}
+body.role-focus header{padding-top:calc(1.4*var(--u));padding-bottom:calc(.8*var(--u))}
+body.role-focus .logo{width:calc(7*var(--u));height:calc(7*var(--u))}
+body.role-focus .dots,body.role-focus .prog{display:none}
+/* ---------- ป้ายเมนูนิ่ง + กรอบไฮไลต์ + ภาพเมนูด้านล่าง (screen=focus) ---------- */
+.fb{flex:1;min-height:0;display:flex;flex-direction:column;gap:calc(1.6*var(--u))}
+.fb.fl{flex-direction:row}
+.fb .board{flex:1 1 0;min-height:0;position:relative}
+/* แบ่ง 2 คอลัมน์อัตโนมัติให้สูงเท่ากัน (หมวดยาวต่อคอลัมน์ถัดไปได้) */
+.fb .bd-cat{background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:none}
+.bd-mc{flex:1;min-height:0;column-count:var(--cols);column-gap:calc(var(--bs)*2.2*var(--u));column-fill:balance}
+.bd-mc .bd-cat{display:block;margin-bottom:calc(var(--bs)*1.4*var(--u));-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.bd-mc .bd-r{break-inside:avoid}.bd-mc .bd-h{break-after:avoid;break-inside:avoid}
+.fb.fl .board{flex:1.25 1 0}
+.fb-pan{flex:0 0 40%;min-height:0;position:relative;border-radius:calc(2.6*var(--u));overflow:hidden;background:#120A05;box-shadow:0 calc(1*var(--u)) calc(4*var(--u)) rgba(0,0,0,.5),0 0 0 calc(.35*var(--u)) var(--acc)}
+.fb.fl .fb-pan{flex:0 0 40%}
+.fp-in{position:absolute;inset:0;animation:fpIn .9s cubic-bezier(.2,.8,.2,1) both}
+.fp-in.out{animation:fpOut .7s ease both}
+.fp-img{position:absolute;inset:0;overflow:hidden}
+.fp-img img.pbg{filter:blur(18px) brightness(.55)}
+.fp-img img.pfg{animation:kb 9s ease-in-out both}
+.fp-img .emo{position:absolute;inset:0;display:grid;place-items:center;font-size:calc(22*var(--u))}
+.fp-txt{position:absolute;left:0;right:0;bottom:0;padding:calc(6*var(--u)) calc(2.6*var(--u)) calc(2*var(--u));background:linear-gradient(transparent,rgba(10,5,2,.88) 45%)}
+.fp-tag{display:inline-block;background:var(--acc);color:#2B1D14;font-weight:800;border-radius:99px;padding:calc(.3*var(--u)) calc(1.4*var(--u));font-size:calc(var(--fs)*2*var(--u));margin-bottom:calc(.6*var(--u))}
+.fp-n{font-family:'Prompt',sans-serif;font-weight:800;font-size:calc(var(--fs)*5.4*var(--u));line-height:1.15;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.fp-d{font-size:calc(var(--fs)*2.1*var(--u));opacity:.85;margin-top:calc(.3*var(--u));display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fp-ps{display:flex;gap:calc(1*var(--u));margin-top:calc(1*var(--u));flex-wrap:wrap}
+.fp-p{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:calc(1.4*var(--u));padding:calc(.4*var(--u)) calc(1.4*var(--u));display:flex;align-items:baseline;gap:calc(.8*var(--u))}
+.fp-p span{font-size:calc(var(--fs)*1.9*var(--u));opacity:.85}.fp-p b{font-size:calc(var(--fs)*var(--fp)*4*var(--u));color:var(--acc);font-weight:800}
+.fb-frame{position:absolute;z-index:3;pointer-events:none;border-radius:calc(1.2*var(--u));border:calc(.45*var(--u)) solid var(--acc);
+  box-shadow:0 0 0 calc(.35*var(--u)) rgba(232,163,61,.25),0 0 calc(3*var(--u)) rgba(232,163,61,.65),inset 0 0 calc(2*var(--u)) rgba(232,163,61,.25);
+  background:rgba(232,163,61,.12);transition:all .75s cubic-bezier(.3,1.25,.4,1);opacity:0}
+.fb-frame.on{opacity:1;animation:frPulse 1.8s ease-in-out infinite}
+.fb-frame::after{content:'👉';position:absolute;left:calc(-3.4*var(--u));top:50%;transform:translateY(-50%);font-size:calc(2.6*var(--u));animation:frPoint 1s ease-in-out infinite}
+.bd-r.fon .bd-n{color:var(--acc);font-weight:800}
+@keyframes frPulse{50%{box-shadow:0 0 0 calc(.6*var(--u)) rgba(232,163,61,.15),0 0 calc(5*var(--u)) rgba(232,163,61,.85),inset 0 0 calc(2*var(--u)) rgba(232,163,61,.3)}}
+@keyframes frPoint{50%{transform:translate(calc(.6*var(--u)),-50%)}}
+@keyframes fpIn{from{opacity:0;transform:translateX(8%) scale(1.03)}to{opacity:1;transform:none}}
+@keyframes fpOut{to{opacity:0;transform:translateX(-6%) scale(.98)}}
+@keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.12)}}
+/* ---------- จอโปรโมต: เพิ่มความอร่อย / QR ---------- */
+.ups{flex:1;min-height:0;display:grid;gap:calc(2*var(--u));align-content:start}
+.ups.ul{grid-template-columns:3fr 2fr}.ups.up{grid-template-rows:auto auto}
+.ups-sn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(1.6*var(--u))}
+.ups-c{background:var(--card);color:var(--ink);border-radius:calc(2*var(--u));overflow:hidden;animation:popUp .6s calc(var(--i)*.12s) both}
+.ups-c .img{aspect-ratio:4/3;display:grid;place-items:center;background:#F3E6D6}.ups-c .emo{font-size:calc(12*var(--u))}.ups-c .img img{width:100%;height:100%;object-fit:cover}
+.ups-c .n{font-weight:700;font-size:calc(var(--fs)*2.4*var(--u));padding:calc(.8*var(--u)) calc(1.2*var(--u)) 0}
+.ups-c .p{font-weight:800;color:var(--pri);font-size:calc(var(--fs)*var(--fp)*2.8*var(--u));padding:0 calc(1.2*var(--u)) calc(1*var(--u))}
+.ups-ad{background:rgba(255,248,239,.07);border:1px solid rgba(255,243,227,.15);border-radius:calc(2*var(--u));padding:calc(1.6*var(--u))}
+.ups-k{color:var(--acc);font-weight:700;font-size:calc(var(--fs)*3*var(--u));margin-bottom:calc(.8*var(--u))}
+.ups-a{display:flex;justify-content:space-between;font-size:calc(var(--fs)*3.2*var(--u));padding:calc(.6*var(--u)) 0;border-bottom:1px dashed rgba(255,243,227,.15);animation:popUp .5s calc(var(--i)*.08s) both}
+.ups-a b{color:var(--acc)}
+.ups-tip{grid-column:1/-1;text-align:center;font-size:calc(var(--fs)*2.4*var(--u));opacity:.8}
+.qrs{flex:1;display:flex;align-items:center;justify-content:center;gap:calc(5*var(--u))}
+.qrs.qp{flex-direction:column;text-align:center}
+.qrs-img{background:#fff;border-radius:calc(3*var(--u));padding:calc(2*var(--u));box-shadow:0 0 calc(6*var(--u)) rgba(232,163,61,.45)}
+.qrs-img img{display:block;width:calc(42*var(--u));height:calc(42*var(--u))}
+.qrs-t h3{font-size:calc(var(--fs)*5.4*var(--u));color:var(--acc);font-weight:800;line-height:1.15}
+.qrs-t p{font-size:calc(var(--fs)*2.6*var(--u));opacity:.85;margin:calc(1*var(--u)) 0}
+.qrs-t ul{list-style:none;font-size:calc(var(--fs)*2.4*var(--u));display:grid;gap:calc(.5*var(--u));opacity:.9}
+@keyframes popUp{from{opacity:0;transform:translateY(calc(2*var(--u))) scale(.96)}to{opacity:1;transform:none}}
 
 /* ---------- ฉากหลังเคลื่อนไหว ---------- */
 #fx{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
@@ -437,12 +553,19 @@ function load(first) {
 }
 let FEST = null, SLOT = null, DAYKEY = '', SLOTKEY = '', FS = 1, CLOSE = null;
 /** ลำดับหน้าบนจอ: config.slideOrder = [{k, on}] • ไม่ได้ตั้ง = ค่าเริ่มต้น • หมวดใหม่ต่อท้ายอัตโนมัติ */
+const ORDER_DEF = {
+  '':    { on: ['closed', 'fest', 'top', 'spot', 'poster', 'promo'], off: ['board', 'new', 'upsell', 'qrs', 'focus'], cats: true },
+  board: { on: ['closed', 'board'], off: ['fest', 'promo', 'poster', 'top', 'upsell', 'spot', 'new', 'qrs', 'focus'], cats: false },
+  promo: { on: ['closed', 'fest', 'top', 'spot', 'new', 'upsell', 'poster', 'promo', 'qrs'], off: ['board', 'focus'], cats: false },
+  focus: { on: ['closed', 'focus'], off: ['fest', 'top', 'spot', 'new', 'upsell', 'poster', 'promo', 'qrs', 'board'], cats: false }
+};
 function slideOrder(c, cats) {
-  let o = []; try { o = JSON.parse(c.slideOrder || '[]') || []; } catch (e) { o = []; }
+  const key = ROLE ? 'slideOrder_' + ROLE : 'slideOrder', def = ORDER_DEF[ROLE];
+  let o = []; try { o = JSON.parse(c[key] || '[]') || []; } catch (e) { o = []; }
   const ck = cats.map(k => 'cat:' + k.name);
-  if (!o.length) o = ['closed', 'fest', ck[0], 'top', 'spot', 'poster', 'promo'].concat(ck.slice(1)).filter(Boolean).map(k => ({ k }));
+  if (!o.length) o = (ROLE ? def.on : ['closed', 'fest', ck[0], 'top', 'spot', 'poster', 'promo']).concat(ROLE ? [] : ck.slice(1)).filter(Boolean).map(k => ({ k }));
   const have = new Set(o.map(x => x.k));
-  ['closed', 'fest', 'top', 'spot', 'poster', 'promo'].concat(ck).forEach(k => { if (!have.has(k)) o.push({ k }); });
+  def.on.concat(def.off).concat(ck).forEach(k => { if (!have.has(k)) o.push({ k, on: def.on.indexOf(k) > -1 || (def.cats && k.indexOf('cat:') === 0) }); });
   return o;
 }
 function closedHtml(x) {
@@ -479,7 +602,18 @@ function priceChips(m, i) {
   return `<div class="prices">${ps.map(p => `<span class="pr ${isFo(p[0]) ? 'fo' : ''}" style="--i:${i}">${esc(p[0] || 'ราคา')} <b>${num(p[1])}</b></span>`).join('')}</div>`;
 }
 const isFo = v => !!(SLOT && SLOT.focus && v && SLOT.focus === v);
-const isLand = () => P.o === 'portrait' ? false : P.o === 'landscape' ? true : innerWidth >= innerHeight;
+/* บทบาทจอ: board = ป้ายราคา (จุดสั่ง) • promo = จอดึงดูด/ขายดี/โปร (ทางเข้า) • ไม่ระบุ = แบบผสมเดิม */
+const ROLE = ['board', 'promo', 'focus'].indexOf(P.screen) > -1 ? P.screen : '';
+/* จอที่ตั้งแนวตั้งแต่เครื่องตั้งหมุนภาพไม่ได้: หมุนทั้งหน้าเอง (rot=270 ทวนเข็ม, rot=90 ตามเข็ม) */
+const ROT = P.rot === '90' ? 90 : (P.rot === '270' || P.rot === '1' || P.rot === '-90') ? 270 : 0;
+if (ROT) { document.documentElement.classList.add('rot', 'rot' + ROT); if (!P.o) P.o = 'portrait'; }
+const VW = () => ROT ? innerHeight : innerWidth, VH = () => ROT ? innerWidth : innerHeight;
+const isLand = () => P.o === 'portrait' ? false : P.o === 'landscape' ? true : VW() >= VH();
+/** ช่วงเร่งด่วน (config.peakTimes เช่น "07:30-09:30,12:00-12:45") */
+function inPeak(c) {
+  const t = new Date(), now = t.getHours() * 60 + t.getMinutes();
+  return String(c.peakTimes || '').split(',').some(r => { const x = r.trim().match(/^(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})$/); if (!x) return false; const a = +x[1] * 60 + +x[2], b = +x[3] * 60 + +x[4]; return now >= a && now < b; });
+}
 const rankOf = n => { const i = D.top.indexOf(n); return i < 0 ? 999 : i; };
 const sortedMenu = cat => D.menu.filter(m => m.category === cat).sort((a, b) => (num(a.sort) || 999) - (num(b.sort) || 999) || rankOf(a.name) - rankOf(b.name));
 function chunk(a, n) { const o = []; for (let i = 0; i < a.length; i += n) o.push(a.slice(i, i + n)); return o; }
@@ -487,6 +621,7 @@ function chunk(a, n) { const o = []; for (let i = 0; i < a.length; i += n) o.pus
 /* ---------------- slideshow ---------------- */
 function build() {
   const land = isLand(); orient = land ? 'L' : 'P';
+  RAIL = !P.cat && P.rail !== '0' && (P.rail === '1' || (ROLE === 'promo' && !land));
   const c = D.config;
   const lite = P.anim === '0' || c.anim === 'N';
   slides = [];
@@ -534,6 +669,12 @@ function build() {
   B.fest = FEST && !P.cat ? [{ html: festHtml(), sec: 8, cls:'festslide' }] : [];
   CLOSE = P.view === 'print' ? null : closureNow(D.closures);
   B.closed = CLOSE && !P.cat ? [{ html: closedHtml(CLOSE), sec: 10, cls:'closedslide' }] : [];
+  B.board = P.cat ? [] : boardPages(cats, land);
+  B.focus = P.cat ? [] : boardPages(cats, land, { focus:true, noAdd:true, perCol: land ? 17 : 22, ncol: 2 });
+  B.new = P.cat ? [] : D.menu.filter(m => /ใหม่|new/i.test(m.badge || '') && !m.soldOut).slice(0, 4).map(m => ({ html: spotHtml(m, null, land, '✨ เมนูใหม่ ลองเลย!'), sec: spotSec + 2, cls:'spotslide' }));
+  B.upsell = P.cat ? [] : upsellHtml(land);
+  B.qrs = P.cat || !D.appUrl ? [] : [{ html: qrSlideHtml(land), sec: 10, cls:'qrslide' }];
+  PEAK = ROLE === 'promo' && inPeak(c);
   const order = slideOrder(c, cats);
   let catsDone = false;
   order.forEach(o => {
@@ -544,6 +685,12 @@ function build() {
     if (o.on !== false) slides.push(...(B[o.k] || []));
   });
   if (P.cat && !slides.length) cats.forEach(k => slides.push(...(B['cat:' + k.name] || [])));
+  /* ช่วงเร่งด่วน (จอโปรโมต): เหลือเฉพาะประกาศ + ขายดี + เฟรมเด่น → ลูกค้าตัดสินใจเร็ว คิวไม่ยาว */
+  if (PEAK) { const keep = new Set([].concat(B.closed, B.top, B.spot)); const f = slides.filter(x => keep.has(x)); if (f.length) slides = f; }
+  if (!slides.length && ROLE === 'board') slides = B.board.slice();
+  if (!slides.length && ROLE === 'focus') slides = B.focus.slice();
+  /* ป้ายราคามีหน้าเดียว: ค้างไว้นาน ๆ แต่ถ้ามีหน้าอื่นด้วย (เช่น ประกาศหยุด/โปร) ให้วนกลับมาที่ป้ายราคาบ่อย ๆ */
+  if (slides.length > 1) slides = slides.map(x => x && x.sec === 600 ? Object.assign({}, x, { sec: 40 }) : x);
   /* ประกาศหยุดร้าน: แทรกซ้ำทุก ๆ 6 หน้า ให้ลูกค้าเห็นบ่อย */
   if (CLOSE && order.find(o => o.k === 'closed' && o.on !== false)) for (let i = 7; i < slides.length; i += 7) slides.splice(i, 0, B.closed[0]);
 
@@ -561,22 +708,26 @@ function build() {
   const tickHtml = tickItems.map(x => `<span>${x}</span>`).join('');
 
   const logo = c.logo ? `<img src="${esc(c.logo)}">` : '☕';
-  document.body.className = (lite ? 'lite' : '') + (FEST ? ' fest' : '');
+  document.body.className = (lite ? 'lite' : '') + (FEST ? ' fest' : '') + (ROLE ? ' role-' + ROLE : '') + (RAIL ? ' has-rail' : '');
   document.getElementById('root').innerHTML = `
     <div id="stage">
     <header><div class="logo-wrap"><div class="steam"><i></i><i></i><i></i></div><div class="logo">${logo}</div></div>
       <div class="hname"><div class="shop" id="shopName">${esc(c.shopName)}</div><div class="tag">${esc(c.tagline)}</div>
-      ${FEST ? `<div class="festchip">${FEST.t.fx[0]} ${esc(FEST.greet)}</div>` : SLOT ? `<div class="slotchip">⏰ ${esc(SLOT.name)}</div>` : ''}</div>
+      ${FEST ? `<div class="festchip">${FEST.t.fx[0]} ${esc(FEST.greet)}</div>` : PEAK ? '<div class="slotchip">⚡ ขายดีช่วงนี้ สั่งได้เลย</div>' : SLOT ? `<div class="slotchip">⏰ ${esc(SLOT.name)}</div>` : ''}</div>
       <div class="hr"><div class="clock"><b id="clk"></b><span id="dt"></span></div>
       ${c.showQr !== 'N' && D.appUrl ? `<div class="qr"><img src="${qrSrc(menuUrl(), 240)}" alt=""><span><b>สแกนดูเมนู</b>บนมือถือ</span></div>` : ''}</div></header>
     <div class="clbar ${CLOSE ? 'on' : ''}">${CLOSE ? `📢 <b>${CLOSE.today ? 'วันนี้ร้านหยุด' : 'ร้านหยุด ' + esc(CLOSE.range)}</b><span>${esc(CLOSE.reopen)}</span>` : ''}</div>
     <div id="slides">${slides.map(s => typeof s === 'string' ? `<section class="slide">${s}</section>` : `<section class="slide ${s.cls || ''}" data-sec="${s.sec || ''}">${s.html}</section>`).join('') || '<div class="msg">ยังไม่มีเมนูที่แสดงบนจอ</div>'}<div class="prog" id="prog"></div></div>
+    ${RAIL ? railHtml(cats) : ''}
     <footer><div class="ticker"><div class="tk" style="--tk:${Math.max(25, tickItems.join('').length / 5)}s">${tickHtml}${tickHtml}</div></div><div class="dots">${slides.map(() => '<i></i>').join('')}</div></footer></div>
     ${P.preview ? '' : '<button class="fs" onclick="fullscreen()">⛶ เต็มจอ</button>'}`;
   if (idx >= slides.length) idx = 0;
   show(idx);
   tick();
   fitName();
+  fitBoards();
+  if (document.querySelector('.focusslide')) { FOC.el = null; setTimeout(() => focusStep(true), 500); focusLoop(); }
+  startRail();
   if (!lite) startFx();
 }
 /** ชื่อร้านบรรทัดเดียว: ย่อขนาดอัตโนมัติถ้ายาวเกินพื้นที่ */
@@ -597,7 +748,7 @@ function festHtml() {
 /* ---------- จัดการ์ดให้เต็มพื้นที่: เลือกจำนวนคอลัมน์/แถวที่ทำให้กรอบรูปใกล้สี่เหลี่ยมจัตุรัสที่สุด และไม่มีช่องว่าง ---------- */
 function areaWH() {
   const u = Math.min(innerWidth, innerHeight) / 100;
-  return { u, W: innerWidth - 7.2 * u, H: innerHeight - (FS * 8 + 30) * u };
+  return { u, W: VW() - 7.2 * u, H: VH() - (FS * 8 + 30) * u - (RAIL ? RAIL_U * u : 0) };
 }
 function fitGrid(count) {
   const { u, W, H } = areaWH(), gap = 2 * u;
@@ -642,6 +793,162 @@ function listHtml(m, i) {
 }
 function minP(m) { const ps = prices(m).map(p => num(p[1])); return ps.length ? Math.min(...ps) : 0; }
 const MEDAL = ['🥇','🥈','🥉'];
+/* ---------- แถบเมนูทั้งหมด (ส่วนล่างจอแนวตั้ง): อยู่นิ่งตลอด เมนูเลื่อนสลับไปเรื่อย ๆ ทีละรายการ ---------- */
+let RAIL = false; const RAIL_U = 50;
+function railHtml(cats) {
+  const MODC = 'ท็อปปิ้ง & เพิ่มพิเศษ', tiles = [];
+  cats.filter(k => k.name !== MODC).forEach(k => {
+    const its = sortedMenu(k.name); if (!its.length) return;
+    tiles.push(`<div class="rl-cat" data-c="${esc(k.name)}" style="--cc:${esc(k.color || '#E8A33D')}"><span class="e">${esc(k.emoji || '☕')}</span><b>${esc(k.name)}</b><small>${its.length} เมนู</small></div>`);
+    its.forEach(m => { const r = rankOf(m.name), ps = D.config.showPrices === 'N' ? [] : prices(m);
+      tiles.push(`<div class="rl-it ${m.soldOut ? 'so' : ''}" data-c="${esc(k.name)}"><div class="img" style="background:radial-gradient(circle at 50% 40%,${esc(k.color || '#E8A33D')}33,${esc(k.color || '#E8A33D')}11)">${m.image ? `<img src="${esc(sz(m.image, 600))}" decoding="async" alt="">` : `<span class="emo">${esc(k.emoji)}</span>`}
+        ${m.soldOut ? '<span class="rl-b sx">หมดแล้ว</span>' : /ใหม่|new/i.test(m.badge || '') ? '<span class="rl-b nw">ใหม่</span>' : r < 3 ? `<span class="rl-b">🔥 ขายดี #${r + 1}</span>` : ''}</div>
+        <div class="n">${esc(menuName(m))}</div><div class="ps">${ps.map(p => `<span class="${isFo(p[0]) ? 'fo' : ''}">${p[0] ? `<i>${esc(p[0])}</i>` : ''}<b>${num(p[1])}</b></span>`).join('')}</div></div>`); });
+  });
+  if (!tiles.length) return '';
+  const tr = tiles.join('');
+  return `<div class="rail"><div class="rl-head"><span>📋 เมนูทั้งหมด</span><b id="rlCat"></b><span class="rl-qr">${D.appUrl ? 'สแกน QR มุมขวาบน ดูรายละเอียด' : ''}</span></div>
+    <div class="rl-view"><div class="rl-track" id="rlTrack">${tr}${tr}</div></div></div>`;
+}
+let railT;
+function startRail() {
+  clearInterval(railT);
+  const tr = document.getElementById('rlTrack'); if (!tr) return;
+  const items = [...tr.children], half = items.length / 2; let i = 0;
+  const hold = Math.max(1.5, num(D.config.railSeconds) || 2.6) * 1000;
+  const label = () => { const c = items[i] && items[i].dataset.c, el = document.getElementById('rlCat'); if (el && c && el.textContent !== c) el.textContent = c; };
+  const go = anim => {
+    const x = items[i].offsetLeft;
+    tr.style.transition = anim ? 'transform .9s cubic-bezier(.45,.05,.2,1)' : 'none';
+    tr.style.transform = `translate3d(${-x}px,0,0)`; label();
+  };
+  go(false);
+  railT = setInterval(() => {
+    i++;
+    go(true);
+    if (i >= half) setTimeout(() => { i -= half; go(false); }, 950);   /* ครบรอบ → กลับต้นแบบไร้รอยต่อ */
+  }, hold);
+}
+/* ---------- ป้ายราคา (จอจุดสั่ง): ทุกหมวดในหน้าเดียวแบบป้ายเมนูเดิม อ่านง่าย ไม่มีรูป ---------- */
+let PEAK = false;
+function boardBlock(k, items, part) {
+  items = items || sortedMenu(k.name); if (!items.length) return null;
+  const hasV = items.some(m => num(m.priceHot) || num(m.priceIced) || num(m.priceBlend));
+  const cols = hasV ? [['priceHot', 'ร้อน'], ['priceIced', 'เย็น'], ['priceBlend', 'ปั่น']].filter(c => items.some(m => num(m[c[0]]))) : [['priceStd', 'ราคา']];
+  const show = D.config.showPrices !== 'N';
+  const val = (m, f) => num(m[f]) || (hasV && f === 'priceIced' && !num(m.priceHot) && !num(m.priceBlend) && num(m.priceStd) ? num(m.priceStd) : 0);
+  const rows = items.map(m => { const r = rankOf(m.name);
+    return `<div data-fi="${esc(m.name)}" class="bd-r ${m.soldOut ? 'so' : ''} ${r < 3 && !m.soldOut ? 'bd-hot' : ''}"><span class="bd-n">${esc(menuName(m))}${m.soldOut ? '<i class="bd-t sx">หมด</i>' : /ใหม่|new/i.test(m.badge || '') ? '<i class="bd-t nw">ใหม่</i>' : r < 3 ? '<i class="bd-t">🔥</i>' : ''}</span>
+      ${show ? cols.map(c => `<b class="bd-p ${isFo(c[1]) ? 'fo' : ''}">${val(m, c[0]) || '–'}</b>`).join('') : ''}</div>`; }).join('');
+  return { n: items.length + 2, html: `<div class="bd-cat" style="--nc:${show ? cols.length : 0}"><div class="bd-h"><span class="bd-e">${esc(k.emoji || '☕')}</span><span class="bd-hn">${esc(k.name)}${part ? ' (ต่อ)' : ''}</span>${show ? cols.map(c => `<span class="bd-c">${c[1]}</span>`).join('') : ''}</div>${rows}</div>` };
+}
+function boardPages(cats, land, opt) {
+  opt = opt || {};
+  const bc = cats.filter(k => (!(D.addons || []).length || k.name !== 'ท็อปปิ้ง & เพิ่มพิเศษ') && sortedMenu(k.name).length);
+  if (!bc.length) return [];
+  const ncol = opt.ncol || (land ? Math.min(4, Math.max(2, bc.length)) : 2);
+  const perCol = Math.round((opt.perCol || (land ? 13 : 22)) / Math.max(.7, FS)), cap = perCol * ncol;  /* แถวต่อคอลัมน์/หน้า โดยประมาณ */
+  /* หมวดที่ยาวเกินคอลัมน์ → แบ่งเป็นหลายก้อน "(ต่อ)" */
+  const blocks = [];
+  bc.forEach(k => { const its = sortedMenu(k.name), per = opt.focus ? 999 : Math.max(4, perCol - 2); for (let i = 0; i < its.length; i += per) blocks.push(boardBlock(k, its.slice(i, i + per), i > 0)); });
+  const pages = []; let cur = [], rows = 0;
+  blocks.forEach(b => { if (cur.length && rows + b.n > cap) { pages.push(cur); cur = []; rows = 0; } cur.push(b); rows += b.n; });
+  if (cur.length) pages.push(cur);
+  const add = D.addons || [];
+  const addHtml = add.length && !opt.noAdd ? `<div class="bd-add"><b>➕ เพิ่มความอร่อย</b>${add.map(a => `<span>${esc(a.name)} <em>+${num(a.price)}</em></span>`).join('')}</div>` : '';
+  return pages.map((pg, i) => {
+    /* แบ่งหมวดลงคอลัมน์ให้สูงใกล้เคียงกัน */
+    /* เรียงตามลำดับหมวด ซ้าย→ขวา (หมวด "(ต่อ)" อยู่ถัดจากหมวดเดิมเสมอ) */
+    const nc = Math.min(ncol, pg.length), tot = pg.reduce((x, b) => x + b.n, 0), target = tot / nc;
+    const colsArr = [{ h:0, b:[] }];
+    pg.forEach((b, j) => { let c = colsArr[colsArr.length - 1]; const left = pg.length - j;
+      if (c.b.length && colsArr.length < nc && (c.h + b.n > target * 1.12 || left <= nc - colsArr.length)) { c = { h:0, b:[] }; colsArr.push(c); }
+      c.b.push(b.html); c.h += b.n; });
+    if (opt.focus) return focusPage(colsArr, i, pages.length, land);
+    return { html: `<div class="board" data-fit="1"><div class="bd-cols" style="--cols:${colsArr.length}">${colsArr.map(c => `<div class="bd-col">${c.b.join('')}</div>`).join('')}</div>${i === pages.length - 1 ? addHtml : ''}${pages.length > 1 ? `<span class="pg bd-pg">${i + 1}/${pages.length}</span>` : ''}</div>`,
+      sec: pages.length > 1 ? Math.max(15, num(D.config.slideSeconds) * 2) : 600, cls:'boardslide' };
+  });
+}
+/* ---------- ป้ายเมนูนิ่ง + กรอบไฮไลต์ ---------- */
+function focusPage(colsArr, i, n, land) {
+  return { html: `<div class="fb ${land ? 'fl' : ''}"><div class="board" data-fit="1" data-focus="1"><div class="bd-mc" style="--cols:${colsArr.length > 1 ? 2 : 1}">${colsArr.map(c => c.b.join('')).join('')}</div>${n > 1 ? `<span class="pg bd-pg">${i + 1}/${n}</span>` : ''}<div class="fb-frame"></div></div><div class="fb-pan"></div></div>`,
+    sec: 0, cls:'focusslide', focus:true };
+}
+/** ลำดับเมนูที่จะไฮไลต์ในหน้านั้น (ข้ามเมนูหมด • ถ้ามีรูป ใช้เฉพาะเมนูที่มีรูป) */
+function focusRows(sl) {
+  const rows = [...sl.querySelectorAll('.bd-r[data-fi]')].filter(r => !r.classList.contains('so'));
+  const withImg = rows.filter(r => { const m = D.menu.find(x => x.name === r.dataset.fi); return m && m.image; });
+  return withImg.length >= Math.min(3, rows.length) ? withImg : rows;
+}
+const FOC = { el:null, i:-1, t:0 };
+function focusPanel(m) {
+  const k = catInfo(m.category), r = rankOf(m.name), ps = D.config.showPrices === 'N' ? [] : prices(m);
+  const lab = { 'ร้อน':'🔥 ร้อน', 'เย็น':'🧊 เย็น', 'ปั่น':'🌀 ปั่น', '':'ราคา' };
+  const tag = /ใหม่|new/i.test(m.badge || '') ? '✨ เมนูใหม่' : r < 3 ? `${MEDAL[r]} ขายดีอันดับ ${r + 1}` : r < 10 ? '🔥 ขายดี' : `${k.emoji || '☕'} ${m.category}`;
+  return `<div class="fp-in"><div class="fp-img" style="background:radial-gradient(circle at 50% 40%,${esc(k.color)}66,#120A05)">${m.image ? pic(m.image) : `<span class="emo">${esc(k.emoji || '☕')}</span>`}</div>
+    <div class="fp-txt"><div class="fp-tag">${esc(tag)}</div><div class="fp-n">${esc(menuName(m))}</div>${m.desc ? `<div class="fp-d">${esc(m.desc)}</div>` : ''}
+    <div class="fp-ps">${ps.map(p => `<div class="fp-p"><span>${lab[p[0]] || esc(p[0])}</span><b>${num(p[1])}</b></div>`).join('')}</div></div></div>`;
+}
+/** ตำแหน่งแถวเทียบกับกล่องป้าย (ใช้ offset ไม่ใช้ getBoundingClientRect → ถูกต้องแม้หมุนจอ rot=90/270) */
+function offIn(el, box) { let x = 0, y = 0, e = el; while (e && e !== box) { x += e.offsetLeft; y += e.offsetTop; e = e.offsetParent; } return { x, y, w: el.offsetWidth, h: el.offsetHeight }; }
+function focusStep(force) {
+  const sl = document.querySelector('.slide.on.focusslide'); if (!sl) { FOC.el = null; return; }
+  if (sl !== FOC.el) { FOC.el = sl; FOC.i = -1; force = true; }
+  const rows = focusRows(sl); if (!rows.length) return;
+  FOC.i = (FOC.i + 1) % rows.length;
+  const row = rows[FOC.i], box = sl.querySelector('.board'), fr = sl.querySelector('.fb-frame'), pan = sl.querySelector('.fb-pan');
+  sl.querySelectorAll('.bd-r.fon').forEach(r => r.classList.remove('fon')); row.classList.add('fon');
+  const o = offIn(row, box), pad = Math.min(innerWidth, innerHeight) * .006;
+  Object.assign(fr.style, { left: (o.x - pad * 1.6) + 'px', top: (o.y - pad) + 'px', width: (o.w + pad * 3.2) + 'px', height: (o.h + pad * 2) + 'px' });
+  fr.classList.add('on');
+  const m = D.menu.find(x => x.name === row.dataset.fi);
+  if (m && pan) {
+    const old = pan.querySelector('.fp-in:not(.out)'); if (old) { old.classList.add('out'); setTimeout(() => old.remove(), 700); }
+    pan.insertAdjacentHTML('beforeend', focusPanel(m));
+  }
+  /* วนครบทุกเมนูในหน้านี้แล้ว → ไปหน้าถัดไป (ถ้ามีหลายหน้า/มีประกาศ) */
+  const ss = document.querySelectorAll('.slide');
+  if (!force && FOC.i === rows.length - 1 && ss.length > 1) FOC.next = true;
+}
+function focusLoop() {
+  clearTimeout(FOC.t);
+  const sec = Math.max(3, num(P.spot) || num(D && D.config && D.config.spotSeconds) || 5);
+  FOC.t = setTimeout(() => {
+    if (FOC.next) { FOC.next = false; const ss = document.querySelectorAll('.slide'); idx = (idx + 1) % ss.length; show(idx); setTimeout(() => focusStep(true), 900); }
+    else focusStep();
+    focusLoop();
+  }, sec * 1000);
+}
+/** ปรับขนาดตัวอักษรป้ายราคาให้เต็มพื้นที่พอดี (ไม่ล้น ไม่โหรง) */
+function fitBoards() {
+  document.querySelectorAll('.board[data-fit]').forEach(b => {
+    const sl = b.closest('.slide'), vis = sl.style.visibility; sl.style.visibility = 'visible';
+    let lo = .55, hi = 1.6;
+    for (let k = 0; k < 9; k++) { const m = (lo + hi) / 2; b.style.setProperty('--bs', m); (b.scrollHeight > b.clientHeight + 2 || b.scrollWidth > b.clientWidth + 2) ? hi = m : lo = m; }
+    b.style.setProperty('--bs', lo); sl.style.visibility = vis;
+  });
+}
+addEventListener('resize', () => { clearTimeout(fitBoards.t); fitBoards.t = setTimeout(fitBoards, 250); });
+/* ---------- จอโปรโมต: เพิ่มความอร่อย (ท็อปปิ้ง + ขนม) ---------- */
+function upsellHtml(land) {
+  const add = (D.addons || []).slice(0, land ? 8 : 6);
+  const snackCats = D.categories.filter(k => /ขนม|เบเกอรี่|เค้ก|ของว่าง|กินเล่น|แซนด์วิช|ครัวซอง|snack|bakery|cake|toast/i.test(k.name)).map(k => k.name);
+  const snacks = D.menu.filter(m => snackCats.indexOf(m.category) > -1 && !m.soldOut).sort((a, b) => (b.image ? 1 : 0) - (a.image ? 1 : 0) || rankOf(a.name) - rankOf(b.name)).slice(0, 4);
+  if (!add.length && !snacks.length) return [];
+  return [{ html: `<div class="s-title"><span class="em">😋</span><h2>เพิ่มความอร่อย</h2><span class="line"></span></div>
+    <div class="ups ${land ? 'ul' : 'up'}">
+      ${snacks.length ? `<div class="ups-sn">${snacks.map((m, i) => `<div class="ups-c" style="--i:${i}"><div class="img">${m.image ? pic(m.image) : `<span class="emo">${esc(catInfo(m.category).emoji)}</span>`}</div><div class="n">${esc(menuName(m))}</div>${minP(m) ? `<div class="p">${minP(m)}.-</div>` : ''}</div>`).join('')}</div>` : ''}
+      ${add.length ? `<div class="ups-ad"><div class="ups-k">ท็อปปิ้ง / เพิ่มพิเศษ</div>${add.map((a, i) => `<div class="ups-a" style="--i:${i}"><span>${esc(a.name)}</span><b>+${num(a.price)}</b></div>`).join('')}</div>` : ''}
+      <div class="ups-tip">บอกพนักงานตอนสั่งได้เลย 🙂</div>
+    </div>`, sec: 10, cls:'upslide' }];
+}
+/* ---------- จอโปรโมต: QR ใหญ่ ---------- */
+function qrSlideHtml(land) {
+  const c = D.config;
+  return `<div class="qrs ${land ? 'ql' : 'qp'}"><div class="qrs-img"><img src="${qrSrc(menuUrl(), 600)}" alt=""></div>
+    <div class="qrs-t"><h3>สแกนดูเมนูทั้งหมด</h3><p>ราคา • รูปเมนู • โปรโมชัน • เมนูขายดี</p>
+    <ul>${c.openTime && c.closeTime ? `<li>🕖 เปิด ${esc(c.openTime)}–${esc(c.closeTime)} น.</li>` : ''}${c.line ? `<li>💬 LINE ${esc(c.line)}</li>` : ''}${c.facebook ? `<li>📘 ${esc(c.facebook)}</li>` : ''}${c.wifiName ? `<li>📶 Wi-Fi ${esc(c.wifiName)}</li>` : ''}</ul></div></div>`;
+}
 function topHtml(top, land) {
   const big = top.slice(0, 3), rest = top.slice(3);
   const sp = ['✨','⭐','✨','🌟','✨'].map((s, i) => `<span class="spark" style="left:${8 + i * 20}%;top:${10 + (i % 2) * 55}%;animation-delay:${i * .5}s">${s}</span>`).join('');
@@ -657,14 +964,14 @@ function topHtml(top, land) {
       <div class="n">${esc(menuName(m))}</div>${D.config.showPrices !== 'N' && minP(m) ? `<div class="p">${minP(m)}.-</div>` : ''}</div>`).join('')}</div>` : ''}`;
 }
 /* เฟรมเด่น: 1 เมนูต่อ 1 เฟรม ภาพใหญ่ */
-function spotHtml(m, rank, land) {
+function spotHtml(m, rank, land, tag) {
   const k = catInfo(m.category);
   const ps = D.config.showPrices === 'N' ? [] : prices(m);
   const lab = { 'ร้อน':'🔥 ร้อน', 'เย็น':'🧊 เย็น', 'ปั่น':'🌀 ปั่น', '':'ราคา' };
   return `<div class="spot ${land ? 'sl' : 'sp2'}">
     <div class="sp-img${m.image && FULL() ? ' full' : ''}" style="${m.image && FULL() ? '' : `background:radial-gradient(circle at 50% 40%,${esc(k.color)}55,${esc(k.color)}11)`}">${m.image ? pic(m.image) : `<span class="emo">${esc(k.emoji)}</span>`}</div>
     <div class="sp-info">
-      <div class="sp-tag">${rank != null ? `${MEDAL[rank] || '🔥'} ขายดีอันดับ ${rank + 1}` : `${esc(k.emoji)} ${esc(m.category)}`}</div>
+      <div class="sp-tag">${tag ? esc(tag) : rank != null ? `${MEDAL[rank] || '🔥'} ขายดีอันดับ ${rank + 1}` : `${esc(k.emoji)} ${esc(m.category)}`}</div>
       ${m.badge ? `<div class="sp-badge">${esc(m.badge)}</div>` : ''}
       <h3>${esc(menuName(m))}</h3>
       ${m.desc ? `<p>${esc(m.desc)}</p>` : ''}
@@ -690,7 +997,9 @@ function show(i) {
   const pr = document.getElementById('prog');
   if (pr) { pr.style.transition = 'none'; pr.style.width = '0'; void pr.offsetWidth; pr.style.transition = `width ${sec}s linear`; pr.style.width = '100%'; }
   clearTimeout(timer);
-  if (ss.length > 1) timer = setTimeout(() => { idx = (i + 1) % ss.length; show(idx); }, sec * 1000);
+  const isF = ss[i] && ss[i].classList.contains('focusslide');
+  if (ss.length > 1 && !isF) timer = setTimeout(() => { idx = (i + 1) % ss.length; show(idx); }, sec * 1000);
+  if (isF) setTimeout(() => focusStep(true), 400);
 }
 function tick() {
   const d = new Date(), c = document.getElementById('clk'), t = document.getElementById('dt');
@@ -707,7 +1016,7 @@ function startFx() {
   const g = cv.getContext('2d');
   let W, Hh, parts = [];
   const acc = getComputedStyle(document.documentElement).getPropertyValue('--acc').trim() || '#E8A33D';
-  const resize = () => { W = cv.width = innerWidth; Hh = cv.height = innerHeight; };
+  const resize = () => { W = cv.width = VW(); Hh = cv.height = VH(); };
   resize(); addEventListener('resize', resize);
   const mk = (y) => { const bean = Math.random() < .45, s = Math.min(W, Hh);
     const fe = FEST && Math.random() < .6 ? FEST.t.fx[Math.floor(Math.random() * FEST.t.fx.length)] : '';
