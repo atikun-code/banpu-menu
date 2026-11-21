@@ -595,7 +595,13 @@ function slideOrder(c, cats) {
   if (!o.length) o = (ROLE ? def.on : ['closed', 'fest', ck[0], 'top', 'spot', 'poster', 'promo']).concat(ROLE ? [] : ck.slice(1)).filter(Boolean).map(k => ({ k }));
   const have = new Set(o.map(x => x.k));
   def.on.concat(def.off).concat(ck).forEach(k => { if (!have.has(k)) o.push({ k, on: def.on.indexOf(k) > -1 || (def.cats && k.indexOf('cat:') === 0) }); });
+  /* โหมดสลับ: ป้ายนิ่ง (ต่อจากประกาศ) → หน้าเคลื่อนไหวตามลำดับของจอโปรโมต → กลับมาป้ายนิ่ง */
+  if (MIX) { const pr = slideOrderOf(c, cats, 'promo').filter(x => x.k !== 'focus' && x.k !== 'board'); const i = pr.findIndex(x => x.k === 'closed'); pr.splice(i + 1, 0, { k:'focus', on:true }); return pr; }
   return o;
+}
+function slideOrderOf(c, cats, role) {
+  const keep = [ROLE, MIX]; ROLE = role; MIX = false;
+  try { return slideOrder(c, cats); } finally { ROLE = keep[0]; MIX = keep[1]; }
 }
 function closedHtml(x) {
   return `<div class="closed-slide"><div class="cl-in">
@@ -632,7 +638,9 @@ function priceChips(m, i) {
 }
 const isFo = v => !!(SLOT && SLOT.focus && v && SLOT.focus === v);
 /* บทบาทจอ: board = ป้ายราคา (จุดสั่ง) • promo = จอดึงดูด/ขายดี/โปร (ทางเข้า) • ไม่ระบุ = แบบผสมเดิม */
-const ROLE = ['board', 'promo', 'focus'].indexOf(P.screen) > -1 ? P.screen : '';
+const ROLE0 = ['board', 'promo', 'focus'].indexOf(P.screen) > -1 ? P.screen : '';
+/* จอ focus: admin เลือกได้ว่าเป็น ป้ายนิ่ง / สลับกับภาพเคลื่อนไหว / ภาพเคลื่อนไหวทั้งหมด (focusCfg.mode) */
+let ROLE = ROLE0, MIX = false;
 /* จอที่ตั้งแนวตั้งแต่เครื่องตั้งหมุนภาพไม่ได้: หมุนทั้งหน้าเอง (rot=270 ทวนเข็ม, rot=90 ตามเข็ม) */
 const ROT = P.rot === '90' ? 90 : (P.rot === '270' || P.rot === '1' || P.rot === '-90') ? 270 : 0;
 if (ROT) { document.documentElement.classList.add('rot', 'rot' + ROT); if (!P.o) P.o = 'portrait'; }
@@ -650,6 +658,7 @@ function chunk(a, n) { const o = []; for (let i = 0; i < a.length; i += n) o.pus
 /* ---------------- slideshow ---------------- */
 function build() {
   const land = isLand(); orient = land ? 'L' : 'P';
+  if (ROLE0 === 'focus') { const md = fcfg().mode; ROLE = md === 'promo' ? 'promo' : 'focus'; MIX = md === 'mix'; }
   RAIL = !P.cat && P.rail !== '0' && (P.rail === '1' || (ROLE === 'promo' && !land));
   const c = D.config;
   const lite = P.anim === '0' || c.anim === 'N';
@@ -864,7 +873,7 @@ function startRail() {
 }
 /* ---------- ป้ายราคา (จอจุดสั่ง): ทุกหมวดในหน้าเดียวแบบป้ายเมนูเดิม อ่านง่าย ไม่มีรูป ---------- */
 /* ตั้งค่าป้ายนิ่ง (admin ปรับได้) */
-const FC_DEF = { layout:'below', fit:'contain', anim:'slide', ken:'Y', panel:40, sec:5, order:'menu', onlyImg:'Y', frame:'glow', cats:[], showDesc:'Y', showTag:'Y' };
+const FC_DEF = { mode:'focus', rounds:1, layout:'below', fit:'contain', anim:'slide', ken:'Y', panel:40, sec:5, order:'menu', onlyImg:'Y', frame:'glow', cats:[], showDesc:'Y', showTag:'Y' };
 function fcfg() { let o = {}; try { o = JSON.parse((D && D.config && D.config.focusCfg) || '{}') || {}; } catch (e) { o = {}; } return Object.assign({}, FC_DEF, o); }
 let PEAK = false, FPER = 0;   /* FPER = แถวต่อคอลัมน์ของป้ายนิ่ง (ปรับลดอัตโนมัติถ้าตัวหนังสือเล็กเกิน) */
 function boardBlock(k, items, part) {
@@ -954,7 +963,9 @@ function focusStep(force) {
   }
   /* วนครบทุกเมนูในหน้านี้แล้ว → ไปหน้าถัดไป (ถ้ามีหลายหน้า/มีประกาศ) */
   const ss = document.querySelectorAll('.slide');
-  if (!force && FOC.i === rows.length - 1 && ss.length > 1) FOC.next = true;
+  if (force) FOC.round = 0;
+  if (FOC.i === rows.length - 1) FOC.round = (FOC.round || 0) + 1;
+  if (!force && FOC.i === rows.length - 1 && ss.length > 1 && FOC.round >= Math.max(1, num(fcfg().rounds) || 1)) { FOC.next = true; FOC.round = 0; }
 }
 function focusLoop() {
   clearTimeout(FOC.t);
